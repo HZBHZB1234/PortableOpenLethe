@@ -16,6 +16,12 @@
     </PackageReference>
   </ItemGroup>
 
+  <ItemGroup>
+    <!-- Web SDK copies wwwroot for `dotnet run`, but explicit content is
+         required for `dotnet publish -o <dir>` used by the portable build. -->
+    <Content Update="wwwroot\**\*" CopyToPublishDirectory="PreserveNewest" />
+  </ItemGroup>
+
   <PropertyGroup>
     <TargetFramework>net9.0</TargetFramework>
     <Nullable>enable</Nullable>

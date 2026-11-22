@@ -202,6 +202,7 @@ app.Use(async (ctx, next) =>
 app.MapGet("/health", () => "ok");
 
 app.MapModFiles();   // /Lethe.dll etc - LetheLauncher fetches these before launch
+app.UseDefaultFiles();   // /admin/ -> /admin/index.html
 app.UseStaticFiles();
 app.MapAuth();
 app.MapAdmin();

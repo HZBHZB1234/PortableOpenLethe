@@ -1,3 +1,4 @@
+using Microsoft.Data.Sqlite;
 using Microsoft.EntityFrameworkCore;
 
 namespace OpenLethe.Data;
@@ -63,8 +64,8 @@ public sealed class AccountStore(AppDbContext ctx)
 
     /// Null on a unique-key collision: a concurrent request created the row between
     /// our find and our insert. Callers re-fetch; the unique indexes guarantee the
-    /// winner's row is the one they get. IngameId itself is DB-generated (identity),
-    /// so ids never collide no matter how many writers race.
+    /// winner's row is the one they get. IngameId is allocated from a counter row
+    /// inside the same transaction, so ids never collide no matter how many writers race.
     private async Task<Account?> CreateAsync(string username, CancellationToken ct, string? discordId = null)
     {
         var now = DateTime.UtcNow;
@@ -76,18 +77,35 @@ public sealed class AccountStore(AppDbContext ctx)
             CreatedAt = now,
             UpdatedAt = now,
         };
-        ctx.Accounts.Add(account);
+
+        await using var tx = await ctx.Database.BeginTransactionAsync(ct);
         try
         {
+            var counter = await ctx.Counters.SingleOrDefaultAsync(c => c.Key == "IngameId", ct);
+            if (counter is null)
+            {
+                counter = new Counter { Key = "IngameId", Value = 1 };
+                ctx.Counters.Add(counter);
+            }
+            else counter.Value++;
+
+            account.IngameId = (int)counter.Value;
+            ctx.Accounts.Add(account);
             await ctx.SaveChangesAsync(ct);
+            await tx.CommitAsync(ct);
+            return account;
         }
-        catch (DbUpdateException e) when (
-            e.InnerException is Npgsql.PostgresException { SqlState: Npgsql.PostgresErrorCodes.UniqueViolation })
+        catch (DbUpdateException e) when (IsUniqueViolation(e))
         {
-            // Detach the failed insert so this context stays usable for the re-fetch.
+            await tx.RollbackAsync(ct);
+            // Detach failed entities so this context stays usable for the re-fetch.
             ctx.Entry(account).State = EntityState.Detached;
+            var c = ctx.Counters.Local.FirstOrDefault(x => x.Key == "IngameId");
+            if (c is not null) ctx.Entry(c).State = EntityState.Detached;
             return null;
         }
-        return account;
     }
+
+    private static bool IsUniqueViolation(DbUpdateException e) =>
+        e.InnerException is SqliteException { SqliteErrorCode: 19 };
 }

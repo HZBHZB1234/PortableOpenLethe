@@ -5,8 +5,8 @@ using Microsoft.Extensions.DependencyInjection;
 using OpenLethe.Data;
 using OpenLethe.Server.Auth;
 
-[Collection("postgres")]
-public class BossRaidHandlerTests(PostgresFixture db)
+[Collection("sqlite")]
+public class BossRaidHandlerTests(SqliteFixture db)
 {
     private static object Body(string jwt, object p) => new
     {
@@ -271,3 +271,4 @@ public class BossRaidHandlerTests(PostgresFixture db)
         Assert.Equal(HttpStatusCode.BadRequest, start.StatusCode);
     }
 }
+

@@ -7,8 +7,8 @@ using OpenLethe.Server;
 using OpenLethe.Server.Auth;
 using OpenLethe.Server.Wire;
 
-[Collection("postgres")]
-public class StoryMirrorDungeonHandlerTests(PostgresFixture db)
+[Collection("sqlite")]
+public class StoryMirrorDungeonHandlerTests(SqliteFixture db)
 {
     private static object Body(string jwt, object p) => new { userAuth = new { authCode = jwt }, parameters = p };
 
@@ -383,3 +383,4 @@ public class StoryMirrorDungeonHandlerTests(PostgresFixture db)
         Assert.Contains(giftId, StoryMdThemeData.GetTheme(910301).GetCombinedEgoGiftPool());
     }
 }
+

@@ -10,8 +10,8 @@ using OpenLethe.Tests.Replay;
 /// the captured ground-truth railway state is written to the account row, then
 /// our response is diffed against the captured one through the per-endpoint mask.
 /// The tracker only ever advances from CAPTURED responses.
-[Collection("postgres")]
-public class RailwayReplayTests(PostgresFixture db)
+[Collection("sqlite")]
+public class RailwayReplayTests(SqliteFixture db)
 {
     private static readonly HashSet<string> Covered = new()
     {
@@ -85,3 +85,4 @@ public class RailwayReplayTests(PostgresFixture db)
         Assert.True(failures.Count == 0, string.Join("\n", failures));
     }
 }
+

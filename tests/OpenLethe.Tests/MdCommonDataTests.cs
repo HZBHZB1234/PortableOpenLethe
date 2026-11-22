@@ -211,8 +211,8 @@ public class MdCommonDataTests
 }
 
 // The upload -> catalog -> handler path end to end.
-[Collection("postgres")]
-public class MdCommonDataEndpointTests(PostgresFixture db)
+[Collection("sqlite")]
+public class MdCommonDataEndpointTests(SqliteFixture db)
 {
     private static object Body(string jwt, object p) => new
     {
@@ -266,3 +266,4 @@ public class MdCommonDataEndpointTests(PostgresFixture db)
         Assert.Equal(10, MdCommonTable.StartEgoGiftPools.Count);
     }
 }
+

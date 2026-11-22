@@ -3,8 +3,8 @@ using OpenLethe.Data;
 // Multi-user hardening: concurrent signups must not collide on IngameId
 // (DB-generated identity, not max+1) and concurrent first logins for the SAME
 // name must converge on one account instead of surfacing a unique violation.
-[Collection("postgres")]
-public class AccountCreationConcurrencyTests(PostgresFixture db)
+[Collection("sqlite")]
+public class AccountCreationConcurrencyTests(SqliteFixture db)
 {
     private const int Writers = 8;
 
@@ -45,3 +45,4 @@ public class AccountCreationConcurrencyTests(PostgresFixture db)
         Assert.Single(check.Accounts, a => a.Username == name);
     }
 }
+

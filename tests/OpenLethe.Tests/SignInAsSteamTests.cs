@@ -6,8 +6,8 @@ using Microsoft.Extensions.DependencyInjection;
 using OpenLethe.Data;
 using OpenLethe.Server.Auth;
 
-[Collection("postgres")]
-public class SignInAsSteamTests(PostgresFixture db)
+[Collection("sqlite")]
+public class SignInAsSteamTests(SqliteFixture db)
 {
     private static string HexEncode(string s) =>
         Convert.ToHexString(Encoding.UTF8.GetBytes(s)).ToLowerInvariant();
@@ -132,3 +132,4 @@ public class SignInAsSteamTests(PostgresFixture db)
         Assert.Equal(HttpStatusCode.OK, resp.StatusCode);
     }
 }
+

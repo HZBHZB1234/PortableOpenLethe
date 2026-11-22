@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.Http.Timeouts;
 using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.EntityFrameworkCore;
 using OpenLethe.Data;
+using OpenLethe.Server;
 using OpenLethe.Server.Auth;
 using OpenLethe.Server.Handlers;
 using OpenLethe.Server.Locale;
@@ -37,24 +38,28 @@ builder.Services.AddRequestTimeouts(o => o.DefaultPolicy = new RequestTimeoutPol
     TimeoutStatusCode = StatusCodes.Status504GatewayTimeout,
 });
 
-var connString = builder.Configuration.GetConnectionString("Postgres");
-
-// Npgsql's default pool ceiling is 100 connections. Every one is a Postgres backend
-// holding its own memory, and on the old 512MB DB VM a login burst that opened dozens of
-// them is what got Postgres OOM-killed. 60 is three times the busiest load seen in the
-// logs (21 active) and fits the 1GB VM. Past the cap, requests queue for a connection
-// instead. An explicit "Maximum Pool Size" in the connection string still wins.
-if (!string.IsNullOrWhiteSpace(connString))
+// Portable build: SQLite file next to the executable. The connection key is kept
+// distinct from upstream's Postgres key so an old .env cannot accidentally point us
+// at a database that no longer has a provider.
+var connString = builder.Configuration.GetConnectionString("Local");
+if (string.IsNullOrWhiteSpace(connString))
 {
-    var csb = new Npgsql.NpgsqlConnectionStringBuilder(connString);
-    if (!connString.Contains("Pool Size", StringComparison.OrdinalIgnoreCase)
-        && !connString.Contains("MaxPoolSize", StringComparison.OrdinalIgnoreCase))
-    {
-        csb.MaxPoolSize = builder.Configuration.GetValue("Postgres:MaxPoolSize", 60);
-    }
-    connString = csb.ConnectionString;
+    var dataDir = Path.Combine(AppContext.BaseDirectory, "data");
+    Directory.CreateDirectory(dataDir);
+    connString = $"Data Source={Path.Combine(dataDir, "openlethe.db")}";
 }
-builder.Services.AddDbContextPool<AppDbContext>(o => o.UseNpgsql(connString));
+else if (connString.StartsWith("Data Source=", StringComparison.OrdinalIgnoreCase))
+{
+    var dbPath = connString["Data Source=".Length..].Trim();
+    var dir = Path.GetDirectoryName(Path.GetFullPath(dbPath));
+    if (!string.IsNullOrEmpty(dir)) Directory.CreateDirectory(dir);
+}
+
+builder.Services.AddDbContextPool<AppDbContext>(o =>
+{
+    o.UseSqlite(connString);
+    o.AddInterceptors(new SqlitePragmaInterceptor());
+});
 builder.Services.AddScoped<AccountStore>();
 
 // Behind a proxy RemoteIpAddress is the edge's, identical for every caller, so the
@@ -132,32 +137,10 @@ builder.Services.AddHttpLogging(o =>
 
 var app = builder.Build();
 
-// Migrate on startup only when a database is actually configured, so tests that
-// exercise DB-free routes can boot without Postgres. (Rust migrates unconditionally.)
-//
-// Retried while the database is unreachable: a deploy or restart that lands while
-// Postgres is down used to abort the process here, and Fly gives up after ten quick
-// crashes. A SQL error from the migration itself (PostgresException) is not
-// transient and still fails immediately.
-if (!string.IsNullOrWhiteSpace(connString))
+// SQLite is a local file: no network-unreachable retry loop is needed.
+using (var scope = app.Services.CreateScope())
 {
-    for (var attempt = 1; ; attempt++)
-    {
-        try
-        {
-            using var scope = app.Services.CreateScope();
-            scope.ServiceProvider.GetRequiredService<AppDbContext>().Database.Migrate();
-            break;
-        }
-        catch (Exception e) when (attempt < 12 && e is not Npgsql.PostgresException
-            && (e is Npgsql.NpgsqlException || e.InnerException is Npgsql.NpgsqlException
-                || e is System.Net.Sockets.SocketException || e is TimeoutException))
-        {
-            var delay = TimeSpan.FromSeconds(Math.Min(Math.Pow(2, attempt), 15));
-            app.Logger.LogWarning(e, "Database unreachable on startup (attempt {Attempt}); retrying in {Delay}", attempt, delay);
-            Thread.Sleep(delay);
-        }
-    }
+    scope.ServiceProvider.GetRequiredService<AppDbContext>().Database.Migrate();
 }
 
 app.UseForwardedHeaders();   // before the rate limiter: it needs the real client IP

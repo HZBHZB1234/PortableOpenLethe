@@ -15,8 +15,8 @@ using OpenLethe.Server.Auth;
 //   - saving through a scoped account leaves the fourteen unloaded columns alone.
 // The scope-to-handler pairings are pinned by the existing per-handler suites: get one
 // wrong and SaveAsync's guard throws, which turns their 200 assertions red.
-[Collection("postgres")]
-public class ScopedAccountReadTests(PostgresFixture db)
+[Collection("sqlite")]
+public class ScopedAccountReadTests(SqliteFixture db)
 {
     // Captures the SQL EF emits so the narrowing can be asserted, not assumed. Read off
     // EF's command log rather than through an IInterceptor: AddDbContextPool builds its
@@ -76,7 +76,8 @@ public class ScopedAccountReadTests(PostgresFixture db)
             Body(jwt, new { dungeonid = 7, idx = 0 }));
         Assert.Equal(HttpStatusCode.OK, resp.StatusCode);
 
-        var select = Assert.Single(f.Sql, s => s.Contains("FROM accounts", StringComparison.Ordinal));
+        var select = Assert.Single(f.Sql, s => s.Contains("accounts", StringComparison.Ordinal)
+            && s.Contains("SELECT", StringComparison.Ordinal));
         Assert.Contains("\"MdSaveInfo\"", select);
         // The fourteen columns this handler never reads must not be in the projection -
         // they are jsonb documents Postgres would detoast and ship for nothing.
@@ -126,3 +127,4 @@ public class ScopedAccountReadTests(PostgresFixture db)
         }
     }
 }
+

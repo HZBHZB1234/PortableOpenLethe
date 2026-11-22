@@ -1,8 +1,8 @@
 using Microsoft.EntityFrameworkCore;
 using OpenLethe.Data;
 
-[Collection("postgres")]
-public class AccountPersistenceTests(PostgresFixture db)
+[Collection("sqlite")]
+public class AccountPersistenceTests(SqliteFixture db)
 {
     [SkippableFact]
     public async Task JsonbDocument_RoundTripsUnchanged()
@@ -56,3 +56,4 @@ public class AccountPersistenceTests(PostgresFixture db)
         }
     }
 }
+

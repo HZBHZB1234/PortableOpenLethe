@@ -5,8 +5,8 @@ using Microsoft.Extensions.DependencyInjection;
 using OpenLethe.Data;
 using OpenLethe.Server.Auth;
 
-[Collection("postgres")]
-public class UseCouponHandlerTests(PostgresFixture db)
+[Collection("sqlite")]
+public class UseCouponHandlerTests(SqliteFixture db)
 {
     [SkippableFact]
     public async Task UseCoupon_ReturnsState1_WithPersonalitiesAndUserInfo()
@@ -31,3 +31,4 @@ public class UseCouponHandlerTests(PostgresFixture db)
         Assert.True(doc.RootElement.GetProperty("updated").GetProperty("personalityList").GetArrayLength() > 0);
     }
 }
+

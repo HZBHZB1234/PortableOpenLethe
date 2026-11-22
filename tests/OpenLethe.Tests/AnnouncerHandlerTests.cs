@@ -5,8 +5,8 @@ using OpenLethe.Data;
 using OpenLethe.Server;
 using OpenLethe.Server.Auth;
 
-[Collection("postgres")]
-public class AnnouncerHandlerTests(PostgresFixture db)
+[Collection("sqlite")]
+public class AnnouncerHandlerTests(SqliteFixture db)
 {
     [SkippableFact]
     public async Task UpdateAnnouncerPreset_PersistsIds()
@@ -33,3 +33,4 @@ public class AnnouncerHandlerTests(PostgresFixture db)
         Assert.Equal(new List<long> { 7, 42 }, stored!);
     }
 }
+

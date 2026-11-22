@@ -7,8 +7,8 @@ using OpenLethe.Server;
 using OpenLethe.Server.Auth;
 using OpenLethe.Server.Wire;
 
-[Collection("postgres")]
-public class StageAndStoryHandlerTests(PostgresFixture db)
+[Collection("sqlite")]
+public class StageAndStoryHandlerTests(SqliteFixture db)
 {
     private static object Body(string jwt, object p) => new
     {
@@ -106,3 +106,4 @@ public class StageAndStoryHandlerTests(PostgresFixture db)
         Assert.Equal(2, stored[0].subcss[0].nss[0].ct);
     }
 }
+

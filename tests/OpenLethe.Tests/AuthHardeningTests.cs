@@ -3,8 +3,8 @@ using System.Net.Http.Json;
 
 // Public-deployment hardening: /auth/login is trust-on-first-use and must be
 // switchable off, and the unauthenticated /auth surface must be rate-limited.
-[Collection("postgres")]
-public class AuthHardeningTests(PostgresFixture db)
+[Collection("sqlite")]
+public class AuthHardeningTests(SqliteFixture db)
 {
     [SkippableFact]
     public async Task Login_NotFound_WhenLocalLoginDisabled()
@@ -50,3 +50,4 @@ public class AuthHardeningTests(PostgresFixture db)
         }
     }
 }
+

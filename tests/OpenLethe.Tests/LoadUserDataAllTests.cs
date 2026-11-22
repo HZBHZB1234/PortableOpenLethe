@@ -7,8 +7,8 @@ using OpenLethe.Server;
 using OpenLethe.Server.Auth;
 using OpenLethe.Server.Wire;
 
-[Collection("postgres")]
-public class LoadUserDataAllTests(PostgresFixture db)
+[Collection("sqlite")]
+public class LoadUserDataAllTests(SqliteFixture db)
 {
     private static object Body(string jwt) => new
     {
@@ -136,3 +136,4 @@ public class LoadUserDataAllTests(PostgresFixture db)
         Assert.Equal(HttpStatusCode.Unauthorized, resp.StatusCode);
     }
 }
+

@@ -7,8 +7,8 @@ using OpenLethe.Server.Auth;
 
 // The per-account MdCatalog cache, keyed on Account.CustomMdRevision: an MD request reads the
 // stamp, never the upload documents, and a changed upload is never served stale.
-[Collection("postgres")]
-public class MdCatalogCacheTests(PostgresFixture db)
+[Collection("sqlite")]
+public class MdCatalogCacheTests(SqliteFixture db)
 {
     private static object Body(string jwt, object p) => new
     {
@@ -102,3 +102,4 @@ public class MdCatalogCacheTests(PostgresFixture db)
         Assert.DoesNotContain(990101L, gifts);
     }
 }
+

@@ -3,8 +3,8 @@ using System.Net.Http.Json;
 using System.Text.Json;
 using OpenLethe.Data;
 
-[Collection("postgres")]
-public class LoginEndpointTests(PostgresFixture db)
+[Collection("sqlite")]
+public class LoginEndpointTests(SqliteFixture db)
 {
     [SkippableFact]
     public async Task Login_CreatesAccount_AndReturnsToken()
@@ -50,3 +50,4 @@ public class LoginEndpointTests(PostgresFixture db)
         Assert.Equal(HttpStatusCode.BadRequest, resp.StatusCode);
     }
 }
+

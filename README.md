@@ -1,4 +1,11 @@
-# Lethe Server C# Port
+> ## Portable build (this fork)
+>
+> This fork targets local/small-scale deployment: SQLite instead of PostgreSQL,
+> no Docker required, and static game data read from a `static/` directory at
+> runtime (never embedded). Run the published server directly; it creates
+> `data/openlethe.db` on first start. Point `STATIC_DATA_DIR` at a directory
+> containing `StaticData/` and `Localize/` (see `docs/` in the planning repo).
+># Lethe Server C# Port
 
 A C# / ASP.NET Core port of the Lethe (Limbus Company private) game server.
 
@@ -149,3 +156,4 @@ failed, if Docker is unavailable).
 ```bash
 dotnet test
 ```
+

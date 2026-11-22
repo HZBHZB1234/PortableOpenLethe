@@ -5,8 +5,8 @@ using Microsoft.Extensions.DependencyInjection;
 using OpenLethe.Data;
 using OpenLethe.Server.Auth;
 
-[Collection("postgres")]
-public class DungeonSaveInfoHandlerTests(PostgresFixture db)
+[Collection("sqlite")]
+public class DungeonSaveInfoHandlerTests(SqliteFixture db)
 {
     [SkippableFact]
     public async Task GetDungeonSaveInfoAll_FreshAccount_ReturnsSentinelBlob()
@@ -39,3 +39,4 @@ public class DungeonSaveInfoHandlerTests(PostgresFixture db)
         Assert.Equal(1, clears[1].GetProperty("idx").GetInt32());
     }
 }
+

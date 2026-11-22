@@ -7,8 +7,8 @@ using OpenLethe.Server;
 using OpenLethe.Server.Auth;
 using OpenLethe.Server.Wire;
 
-[Collection("postgres")]
-public class MirrorDungeonRewardsHandlerTests(PostgresFixture db)
+[Collection("sqlite")]
+public class MirrorDungeonRewardsHandlerTests(SqliteFixture db)
 {
     private static object Body(string jwt, object p) => new { userAuth = new { authCode = jwt }, parameters = p };
 
@@ -356,3 +356,4 @@ public class MirrorDungeonRewardsHandlerTests(PostgresFixture db)
         Assert.Equal(7, stored.currentInfo.cost); // unchanged - index rejected, not wrapped
     }
 }
+

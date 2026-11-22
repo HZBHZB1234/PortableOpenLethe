@@ -14,3 +14,11 @@ modfiles/
 *.user
 /.vs/OpenLethe
 /.vs
+
+# Portable local data
+data/
+*.db
+*.db-wal
+*.db-shm
+static/
+

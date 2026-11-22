@@ -7,8 +7,8 @@ using OpenLethe.Server;
 using OpenLethe.Server.Auth;
 using OpenLethe.Server.Wire;
 
-[Collection("postgres")]
-public class MirrorDungeonHandlerTests(PostgresFixture db)
+[Collection("sqlite")]
+public class MirrorDungeonHandlerTests(SqliteFixture db)
 {
     private static object Body(string jwt, object p) => new { userAuth = new { authCode = jwt }, parameters = p };
 
@@ -86,3 +86,4 @@ public class MirrorDungeonHandlerTests(PostgresFixture db)
         Assert.Equal(4, result.GetProperty("mirrorOriginSaveInfo").GetProperty("dungeonId").GetInt32());
     }
 }
+

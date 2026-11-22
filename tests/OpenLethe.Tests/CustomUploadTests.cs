@@ -8,8 +8,8 @@ using OpenLethe.Server.Auth;
 using OpenLethe.Server.Wire;
 
 /// Covers the /custom/upload/* port of lethe-server/server/src/custom/mod.rs.
-[Collection("postgres")]
-public class CustomUploadTests(PostgresFixture db)
+[Collection("sqlite")]
+public class CustomUploadTests(SqliteFixture db)
 {
     private static object Body(string jwt, object p) => new
     {
@@ -129,3 +129,4 @@ public class CustomUploadTests(PostgresFixture db)
         Assert.Equal(HttpStatusCode.Unauthorized, resp.StatusCode);
     }
 }
+

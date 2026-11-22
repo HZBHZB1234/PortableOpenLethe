@@ -7,8 +7,8 @@ using OpenLethe.Server.Auth;
 // Auth:DevAcceptAnyToken - SignInAsSteam accepts ANY jwt as an identity (subject
 // read without verifying the signature), auto-creates the account, and returns a
 // token the server itself signed so later /api/ calls still verify.
-[Collection("postgres")]
-public class SignInAsSteamDevTests(PostgresFixture db)
+[Collection("sqlite")]
+public class SignInAsSteamDevTests(SqliteFixture db)
 {
     private static string HexEncode(string s) =>
         Convert.ToHexString(Encoding.UTF8.GetBytes(s)).ToLowerInvariant();
@@ -60,3 +60,4 @@ public class SignInAsSteamDevTests(PostgresFixture db)
         Assert.Equal(HttpStatusCode.BadRequest, resp.StatusCode);
     }
 }
+

@@ -166,8 +166,8 @@ public class MdCatalogTests
 }
 
 // The upload -> catalog -> handler path end to end.
-[Collection("postgres")]
-public class MdCatalogEndpointTests(PostgresFixture db)
+[Collection("sqlite")]
+public class MdCatalogEndpointTests(SqliteFixture db)
 {
     private static object Body(string jwt, object p) => new
     {
@@ -274,3 +274,4 @@ public class MdCatalogEndpointTests(PostgresFixture db)
         Assert.Equal(990101, reward.rewardId);
     }
 }
+

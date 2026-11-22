@@ -1,7 +1,7 @@
 using OpenLethe.Data;
 
-[Collection("postgres")]
-public class AccountStoreTests(PostgresFixture db)
+[Collection("sqlite")]
+public class AccountStoreTests(SqliteFixture db)
 {
     [SkippableFact]
     public async Task GetOrCreate_IsIdempotent_ForSameUsername()
@@ -40,3 +40,4 @@ public class AccountStoreTests(PostgresFixture db)
         Assert.Null(await new AccountStore(ctx).FindByUsernameAsync($"missing_{Guid.NewGuid():N}"));
     }
 }
+

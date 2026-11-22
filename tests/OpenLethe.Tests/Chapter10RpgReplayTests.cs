@@ -14,8 +14,8 @@ using OpenLethe.Tests.Replay;
 /// the server only files the rows. So a fresh account's state evolves from the captured
 /// requests alone, which makes the 144 replayed records one continuous chain: every
 /// getter is answered out of state our own handlers built from every earlier update.
-[Collection("postgres")]
-public class Chapter10RpgReplayTests(PostgresFixture db)
+[Collection("sqlite")]
+public class Chapter10RpgReplayTests(SqliteFixture db)
 {
     /// The capture opens on an account carrying a previous session (lastSeq 1236, two
     /// ending rows) that it never shows being written, so records 3-6 - two status reads,
@@ -90,3 +90,4 @@ public class Chapter10RpgReplayTests(PostgresFixture db)
         return true;
     }
 }
+

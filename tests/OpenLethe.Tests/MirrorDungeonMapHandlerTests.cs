@@ -7,8 +7,8 @@ using OpenLethe.Server;
 using OpenLethe.Server.Auth;
 using OpenLethe.Server.Wire;
 
-[Collection("postgres")]
-public class MirrorDungeonMapHandlerTests(PostgresFixture db)
+[Collection("sqlite")]
+public class MirrorDungeonMapHandlerTests(SqliteFixture db)
 {
     private static object Body(string jwt, object p) => new { userAuth = new { authCode = jwt }, parameters = p };
 
@@ -444,3 +444,4 @@ public class MirrorDungeonMapHandlerTests(PostgresFixture db)
         Assert.Equal(HttpStatusCode.InternalServerError, resp.StatusCode);
     }
 }
+

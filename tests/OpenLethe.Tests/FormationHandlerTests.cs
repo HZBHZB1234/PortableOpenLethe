@@ -5,8 +5,8 @@ using OpenLethe.Data;
 using OpenLethe.Server;
 using OpenLethe.Server.Auth;
 
-[Collection("postgres")]
-public class FormationHandlerTests(PostgresFixture db)
+[Collection("sqlite")]
+public class FormationHandlerTests(SqliteFixture db)
 {
     private static object Body(string jwt, object p) => new
     {
@@ -39,3 +39,4 @@ public class FormationHandlerTests(PostgresFixture db)
         Assert.Contains(stored!, x => x.id == 5);
     }
 }
+

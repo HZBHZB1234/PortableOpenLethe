@@ -7,7 +7,7 @@ public class AccountModelTests
     {
         // No connection needed - we only inspect model metadata, never query.
         var options = new DbContextOptionsBuilder<AppDbContext>()
-            .UseNpgsql("Host=unused;Database=unused")
+            .UseSqlite("Data Source=:memory:")
             .Options;
         return new AppDbContext(options);
     }
@@ -24,12 +24,13 @@ public class AccountModelTests
     }
 
     [Fact]
-    public void GameDataColumns_AreJsonb()
+    public void GameDataColumns_AreText()
     {
         using var ctx = BuildContext();
         var et = ctx.Model.FindEntityType(typeof(Account))!;
 
-        Assert.Equal("jsonb", et.FindProperty(nameof(Account.MdSaveInfo))!.GetColumnType());
-        Assert.Equal("jsonb", et.FindProperty(nameof(Account.Egos))!.GetColumnType());
+        Assert.Equal("TEXT", et.FindProperty(nameof(Account.MdSaveInfo))!.GetColumnType());
+        Assert.Equal("TEXT", et.FindProperty(nameof(Account.Egos))!.GetColumnType());
     }
 }
+

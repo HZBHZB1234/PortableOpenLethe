@@ -6,8 +6,9 @@ namespace OpenLethe.Data;
 public sealed class AppDbContext(DbContextOptions<AppDbContext> options) : DbContext(options)
 {
     public DbSet<Account> Accounts => Set<Account>();
+    public DbSet<Counter> Counters => Set<Counter>();
 
-    /// Every game-data column; each is jsonb.
+    /// Every game-data column; each is stored as TEXT holding a JSON document.
     internal static readonly string[] JsonColumns =
     {
         nameof(Account.Formations), nameof(Account.Egos), nameof(Account.Personalities),
@@ -35,14 +36,13 @@ public sealed class AppDbContext(DbContextOptions<AppDbContext> options) : DbCon
         a.HasKey(x => x.Id);
         a.HasIndex(x => x.Username).IsUnique();
         a.HasIndex(x => x.IngameId).IsUnique();
-        // DB-generated so concurrent signups can't collide; BY DEFAULT (not ALWAYS)
-        // because the dashboard's ingameid/update writes explicit values.
-        a.Property(x => x.IngameId).UseIdentityByDefaultColumn();
+        // IngameId is allocated from the counters table inside a transaction
+        // (SQLite AUTOINCREMENT only works on INTEGER PRIMARY KEY, and Id is the PK).
         // Filtered: dev-login accounts share DiscordId == null.
         a.HasIndex(x => x.DiscordId).IsUnique().HasFilter("\"DiscordId\" IS NOT NULL");
         a.Property(x => x.Username).IsRequired();
 
-        foreach (var name in JsonColumns) a.Property(name).HasColumnType("jsonb");
+        b.Entity<Counter>().ToTable("counters").HasKey(x => x.Key);
     }
 
     public override int SaveChanges(bool acceptAllChangesOnSuccess)
@@ -57,10 +57,9 @@ public sealed class AppDbContext(DbContextOptions<AppDbContext> options) : DbCon
         return base.SaveChangesAsync(acceptAllChangesOnSuccess, ct);
     }
 
-    /// jsonb doesn't store the text it was given: it reorders keys and respaces, so a
-    /// document read back and re-serialized unchanged never string-equals what was loaded,
-    /// and EF would rewrite it. Each rewrite of a large document leaves a dead TOAST copy
-    /// behind for autovacuum, so unmark any document whose JSON content is the same.
+    /// A JSON document read back and re-serialized may differ in key order/whitespace from
+    /// what was loaded, so EF would rewrite unchanged large documents. Compare semantically
+    /// and unmark unchanged ones to avoid needless writes (and WAL growth on SQLite).
     ///
     /// A custom MD upload that really changed restamps CustomMdRevision. The stamp is a fresh
     /// value, not an increment: a scoped upload never loaded the old one. The client re-sends

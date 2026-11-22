@@ -5,8 +5,8 @@ using OpenLethe.Data;
 using OpenLethe.Server.Auth;
 using OpenLethe.Tests.Replay;
 
-[Collection("postgres")]
-public class MdExtremeReplayTests(PostgresFixture db)
+[Collection("sqlite")]
+public class MdExtremeReplayTests(SqliteFixture db)
 {
     // Endpoints this slice asserts (already correct). Grows each slice until it's all of
     // them. The 5 seeded here all turned out to have genuine deterministic divergences on
@@ -306,3 +306,4 @@ public class MdExtremeReplayTests(PostgresFixture db)
         Assert.True(failures.Count == 0, string.Join("\n", failures));
     }
 }
+

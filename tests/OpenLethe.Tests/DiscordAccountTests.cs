@@ -4,8 +4,8 @@ using OpenLethe.Data;
 // Discord login produces a row whose Username is the snowflake - because Username
 // is what every handler resolves the JWT `sub` against, so anything else yields a
 // token that matches no account.
-[Collection("postgres")]
-public class DiscordAccountTests(PostgresFixture db)
+[Collection("sqlite")]
+public class DiscordAccountTests(SqliteFixture db)
 {
     private static string Snowflake() => Random.Shared.NextInt64(1, long.MaxValue).ToString();
 
@@ -97,3 +97,4 @@ public class DiscordAccountTests(PostgresFixture db)
         Assert.Null(b?.DiscordId);
     }
 }
+

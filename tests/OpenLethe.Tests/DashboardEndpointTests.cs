@@ -10,8 +10,8 @@ using OpenLethe.Server.Wire;
 /// Covers the /dashboard/* port of lethe-server/server/src/dashboard.rs. These
 /// routes carry the token in the request BODY (no game envelope), so they are
 /// exempt from JwtAuthMiddleware and authenticate themselves.
-[Collection("postgres")]
-public class DashboardEndpointTests(PostgresFixture db)
+[Collection("sqlite")]
+public class DashboardEndpointTests(SqliteFixture db)
 {
     private async Task<(DbWebAppFactory F, HttpClient Client, string Name, string Jwt)> NewUserAsync()
     {
@@ -293,3 +293,4 @@ public class DashboardEndpointTests(PostgresFixture db)
         Assert.True(list[0].GetProperty("enablePacketCrypt").GetBoolean());
     }
 }
+

@@ -11,8 +11,9 @@ public class DbWebAppFactory(string connString, params (string Key, string Value
 
     protected override void ConfigureWebHost(IWebHostBuilder builder)
     {
-        builder.UseSetting("ConnectionStrings:Postgres", connString);
+        builder.UseSetting("ConnectionStrings:Local", connString);
         builder.UseSetting("Auth:JwtSecret", TestSecret);
         foreach (var (key, value) in settings) builder.UseSetting(key, value);
     }
 }
+

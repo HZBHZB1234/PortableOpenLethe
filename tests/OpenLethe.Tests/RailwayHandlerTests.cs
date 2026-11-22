@@ -6,8 +6,8 @@ using OpenLethe.Data;
 using OpenLethe.Server;
 using OpenLethe.Server.Auth;
 
-[Collection("postgres")]
-public class RailwayHandlerTests(PostgresFixture db)
+[Collection("sqlite")]
+public class RailwayHandlerTests(SqliteFixture db)
 {
     private const long Rr2 = 1002;   // Refraction Railway 2's rerun - the captured dungeon
 
@@ -446,3 +446,4 @@ public class RailwayHandlerTests(PostgresFixture db)
         Assert.Equal(2, (await StateOf(f, name))[5].save.currentnode);
     }
 }
+

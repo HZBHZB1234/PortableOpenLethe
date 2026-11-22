@@ -7,8 +7,8 @@ using OpenLethe.Server;
 using OpenLethe.Server.Auth;
 using OpenLethe.Server.Wire;
 
-[Collection("postgres")]
-public class StoryDungeonHandlerTests(PostgresFixture db)
+[Collection("sqlite")]
+public class StoryDungeonHandlerTests(SqliteFixture db)
 {
     private static object Body(string jwt, object p) => new { userAuth = new { authCode = jwt }, parameters = p };
 
@@ -405,3 +405,4 @@ public class StoryDungeonHandlerTests(PostgresFixture db)
         Assert.Equal(-1, stored.currentinfo.pce[0].nei);
     }
 }
+

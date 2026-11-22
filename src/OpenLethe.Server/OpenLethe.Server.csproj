@@ -4,6 +4,8 @@
     <ProjectReference Include="..\OpenLethe.Packets\OpenLethe.Packets.csproj" />
     <ProjectReference Include="..\OpenLethe.Data\OpenLethe.Data.csproj" />
     <ProjectReference Include="..\OpenLethe.Resources\OpenLethe.Resources.csproj" />
+    <ProjectReference Include="..\OpenLethe.PluginHost\OpenLethe.PluginHost.csproj" />
+    <ProjectReference Include="..\OpenLethe.Scripting\OpenLethe.Scripting.csproj" />
   </ItemGroup>
 
   <ItemGroup>

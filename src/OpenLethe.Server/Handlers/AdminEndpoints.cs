@@ -123,6 +123,36 @@ public static class AdminEndpoints
             return Task.FromResult(Results.Json(new { ok = true }));
         }));
 
+        app.MapPost("/admin/scripts/grants", Admin(async (db, body, _) =>
+        {
+            if (!body.TryGetProperty("scriptId", out var sid) || !Guid.TryParse(sid.GetString(), out var scriptId)
+                || !body.TryGetProperty("username", out var u) || u.ValueKind != JsonValueKind.String
+                || !body.TryGetProperty("capabilities", out var caps) || caps.ValueKind != JsonValueKind.Array)
+                return Results.BadRequest();
+
+            var account = await db.Accounts.SingleOrDefaultAsync(a => a.Username == u.GetString());
+            var script = await db.UserScripts.SingleOrDefaultAsync(s => s.Id == scriptId);
+            if (account is null || script is null) return Results.NotFound();
+
+            var list = caps.EnumerateArray().Where(c => c.ValueKind == JsonValueKind.String)
+                .Select(c => c.GetString()!).ToList();
+            var grant = await db.ScriptGrants.SingleOrDefaultAsync(g =>
+                g.ScriptId == scriptId && g.GranteeAccountId == account.Id);
+            if (grant is null)
+            {
+                grant = new OpenLethe.Data.ScriptGrant
+                {
+                    Id = Guid.NewGuid(), ScriptId = scriptId,
+                    GranteeAccountId = account.Id, GrantedAt = DateTime.UtcNow,
+                };
+                db.ScriptGrants.Add(grant);
+            }
+            grant.Capabilities = System.Text.Json.JsonSerializer.Serialize(list);
+            grant.GrantedAt = DateTime.UtcNow;
+            await db.SaveChangesAsync();
+            return Results.Json(new { ok = true, capabilities = list });
+        }));
+
         return app;
     }
 

@@ -7,6 +7,8 @@ public sealed class AppDbContext(DbContextOptions<AppDbContext> options) : DbCon
 {
     public DbSet<Account> Accounts => Set<Account>();
     public DbSet<Counter> Counters => Set<Counter>();
+    public DbSet<UserScript> UserScripts => Set<UserScript>();
+    public DbSet<ScriptGrant> ScriptGrants => Set<ScriptGrant>();
 
     /// Every game-data column; each is stored as TEXT holding a JSON document.
     internal static readonly string[] JsonColumns =
@@ -43,6 +45,11 @@ public sealed class AppDbContext(DbContextOptions<AppDbContext> options) : DbCon
         a.Property(x => x.Username).IsRequired();
 
         b.Entity<Counter>().ToTable("counters").HasKey(x => x.Key);
+
+        b.Entity<UserScript>().ToTable("user_scripts").HasKey(x => x.Id);
+        b.Entity<UserScript>().HasIndex(x => new { x.AccountId, x.Name }).IsUnique();
+        b.Entity<ScriptGrant>().ToTable("script_grants").HasKey(x => x.Id);
+        b.Entity<ScriptGrant>().HasIndex(x => new { x.ScriptId, x.GranteeAccountId }).IsUnique();
     }
 
     public override int SaveChanges(bool acceptAllChangesOnSuccess)

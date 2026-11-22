@@ -7,6 +7,8 @@ using OpenLethe.Server.Auth;
 using OpenLethe.Server.Handlers;
 using OpenLethe.Server.Locale;
 using OpenLethe.Server.Login;
+using OpenLethe.PluginHost;
+using OpenLethe.Scripting;
 
 // Load a .env (searching up from the CWD) into process environment BEFORE the builder
 // reads configuration, so ConnectionStrings__Postgres / Auth__JwtSecret can live in a
@@ -61,6 +63,15 @@ builder.Services.AddDbContextPool<AppDbContext>(o =>
     o.AddInterceptors(new SqlitePragmaInterceptor());
 });
 builder.Services.AddScoped<AccountStore>();
+
+// Admin-installed full-trust plugins. Loaded before Build() so they can
+// register services; their endpoints are mapped after the app is built.
+var pluginsEnabled = builder.Configuration.GetValue("Plugins:Enabled", false);
+var plugins = pluginsEnabled
+    ? PluginLoader.Load(builder.Configuration["Plugins:Dir"] ?? "plugins",
+        LoggerFactory.Create(b => b.AddConsole()).CreateLogger("PluginLoader"))
+    : [];
+foreach (var plugin in plugins) plugin.Instance.ConfigureServices(builder.Services, builder.Configuration);
 
 // Behind a proxy RemoteIpAddress is the edge's, identical for every caller, so the
 // limiter below would bucket the whole internet as one. Fly's edge isn't in a
@@ -166,6 +177,7 @@ app.UseRequestTimeouts();
 app.UseHttpLogging();   // before UseJwtAuth so it sees the raw, unconsumed body
 
 app.UseJwtAuth();   // 401s protected routes lacking a valid token; exempts /login,/auth,/health
+app.UseScriptInterception();   // per-user scripts may intercept /api/* and /login/*
 
 // A fresh MdCatalog slot per request, which HandlerContext.ResolveAsync fills with the account's
 // uploaded MD content. Async so the slot is scoped to this request and never outlives it.
@@ -182,6 +194,8 @@ app.UseStaticFiles();
 app.MapAuth();
 app.MapAdmin();
 app.MapHub();
+app.MapScripts();
+foreach (var plugin in plugins) plugin.Instance.MapEndpoints(app);
 app.MapLocale();
 app.MapDashboard();
 app.MapCustomUpload();

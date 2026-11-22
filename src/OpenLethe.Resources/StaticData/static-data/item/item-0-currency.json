@@ -1,0 +1,38 @@
+{
+  "list":[
+    {
+      "id":1,
+
+      "category": "NORMAL",
+      "spriteStr":"lunacy"
+    },
+
+    {
+      "id":2,
+
+      "category": "NORMAL",
+      "spriteStr":"lunacy"
+    },
+
+    {
+      "id":3,
+
+      "category": "NORMAL",
+      "spriteStr":"lunacy",
+      "ignoreExcess": true
+    },
+
+    {
+      "id": 11,
+
+      "category": "NORMAL",
+      "spriteStr":"enkephalinmodule"
+    },
+    {
+      "id": 21,
+
+      "category": "NORMAL",
+      "spriteStr":"hellChain"
+    }
+  ]
+}

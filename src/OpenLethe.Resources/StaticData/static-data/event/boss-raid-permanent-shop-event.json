@@ -1,0 +1,132 @@
+{
+	"list": [
+		{
+			"id": 49,
+			"startDate": "2000-01-01T00:00:00.000Z",
+			"startDateForUI": "2000-01-01T00:00:00.000Z",
+			"endDate": "9999-12-31T00:00:00.000Z",
+			"endDateForUI": "9999-12-31T00:00:00.000Z",
+			"gracePeriod": "9999-12-31T00:00:00.000Z",
+			"eventRewardDatas": [
+				{
+					"rewardId": 1,
+					"rewardPrice": {
+						"type": "ITEM",
+						"id": 20045,
+						"num": 100
+					},
+					"rewardItemList": [
+						{
+							"type": "ITEM",
+							"id": 9900,
+							"num": 125
+						}
+					],
+					"limitCount": 4
+				},
+				{
+					"rewardId": 2,
+					"rewardPrice": {
+						"type": "ITEM",
+						"id": 20045,
+						"num": 150
+					},
+					"rewardItemList": [
+						{
+							"type": "ITEM",
+							"id": 232,
+							"num": 1
+						}
+					],
+					"limitCount": 2
+				},
+				{
+					"rewardId": 3,
+					"rewardPrice": {
+						"type": "ITEM",
+						"id": 20045,
+						"num": 15
+					},
+					"rewardItemList": [
+						{
+							"type": "ITEM",
+							"id": 214,
+							"num": 2
+						}
+					],
+					"limitCount": 80
+				},
+				{
+					"rewardId": 4,
+					"rewardPrice": {
+						"type": "ITEM",
+						"id": 20045,
+						"num": 5
+					},
+					"rewardItemList": [
+						{
+							"type": "ITEM",
+							"id": 213,
+							"num": 2
+						}
+					],
+					"limitCount": 20
+				},
+                {
+                  "rewardId": 10001,
+                  "rewardPrice": {
+                    "type": "ITEM",
+                    "id": 20045,
+                    "num": 5
+                  },
+                  "rewardItemList": [
+                    {
+                      "type": "ITEM",
+                      "id": 213,
+                      "num": 1
+                    }
+                  ],
+                  "limitCount": 999,
+                  "isDisabled": true
+                },
+				{
+					"rewardId": 10002,
+					"rewardPrice": {
+						"type": "ITEM",
+						"id": 20045,
+						"num": 5
+					},
+					"rewardItemList": [
+						{
+							"type": "ITEM",
+							"id": 213,
+							"num": 1
+						}
+					],
+					"limitCount": 999,
+					"isDisabled": false,
+					"uiConfig": {
+						"warningTextKeyBeforePurchase": "boss_raid_shop_infinite_item_warning_text"
+					}
+				},
+                {
+                  "rewardId": 90001,
+                  "rewardPrice": {
+                    "type": "ITEM",
+                    "id": 20048,
+                    "num": 1
+                  },
+                  "rewardItemList": [
+                    {
+                      "type": "ITEM",
+                      "id": 20045,
+                      "num": 1
+                    }
+                  ],
+                  "isAutoConvertable": true
+                }
+			],
+			"eventMainItemId": 20045
+		}
+	]
+}

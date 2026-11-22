@@ -1,0 +1,20 @@
+# Keep the build context small and clean. docs/ (gitignored, contains large flow
+# captures) and .superpowers/ must be excluded or the build is huge and slow.
+**/bin
+**/obj
+.git
+.gitignore
+# Never let secrets into the build context - the server reads .env via env_file at
+# RUN time, it must not be baked into the image.
+.env
+.dockerignore
+Dockerfile
+docker-compose.yml
+run.bat
+docs
+.superpowers
+tests
+.vs
+.vscode
+.idea
+*.md

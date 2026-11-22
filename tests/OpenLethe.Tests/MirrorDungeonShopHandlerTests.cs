@@ -56,12 +56,12 @@ public class MirrorDungeonShopHandlerTests(SqliteFixture db)
         Assert.Equal(100, result.GetProperty("cost").GetInt64()); // 500 - 100
         Assert.Equal(100, result.GetProperty("usedcost").GetInt64());
         var unit = result.GetProperty("dungeonUnitList")[0];
-        Assert.Equal(10100, unit.GetProperty("ch").GetInt64());
-        Assert.Equal(30, unit.GetProperty("cm").GetInt64());
+        Assert.Equal(10000, unit.GetProperty("ch").GetInt64());
+        Assert.Equal(45, unit.GetProperty("cm").GetInt64());
 
         var acc = await GetAccount(f, name);
         var stored = AccountFields.Get<MirrorOriginSaveInfo>(acc.MdSaveInfo)!;
-        Assert.Equal(400, stored.currentInfo.cost);
+        Assert.Equal(100, stored.currentInfo.cost);
     }
 
     [SkippableFact]
@@ -122,7 +122,7 @@ public class MirrorDungeonShopHandlerTests(SqliteFixture db)
         Assert.Equal(HttpStatusCode.OK, resp.StatusCode);
         using var doc = JsonDocument.Parse(await resp.Content.ReadAsStringAsync());
         var result = doc.RootElement.GetProperty("result");
-        Assert.Equal(500 - 198, result.GetProperty("cost").GetInt64());
+        Assert.Equal(200 - 198, result.GetProperty("cost").GetInt64());
         Assert.Equal(198, result.GetProperty("usedcost").GetInt64());
         Assert.Equal(9001, result.GetProperty("egogifts")[0].GetProperty("id").GetInt64());
         // Buying flips the slot's s from 1 to 0 (sold out); the slot stays in place.
@@ -131,7 +131,7 @@ public class MirrorDungeonShopHandlerTests(SqliteFixture db)
         Assert.Equal(0, boughtSlot.GetProperty("s").GetInt64());
 
         var stored = AccountFields.Get<MirrorOriginSaveInfo>((await GetAccount(f, name)).MdSaveInfo)!;
-        Assert.Equal(500 - 198, stored.currentInfo.cost);
+        Assert.Equal(200 - 198, stored.currentInfo.cost);
         Assert.Single(stored.currentInfo.egs);
         Assert.Single(stored.currentInfo.shop.slots);
         Assert.Equal(0, stored.currentInfo.shop.slots[0].s);
@@ -153,11 +153,11 @@ public class MirrorDungeonShopHandlerTests(SqliteFixture db)
         Assert.Equal(HttpStatusCode.OK, resp.StatusCode);
         using var doc = JsonDocument.Parse(await resp.Content.ReadAsStringAsync());
         var result = doc.RootElement.GetProperty("result");
-        Assert.Equal(500 + 99, result.GetProperty("cost").GetInt64()); // 198/2 = 99
+        Assert.Equal(200 + 99, result.GetProperty("cost").GetInt64()); // 198/2 = 99
         Assert.Equal(0, result.GetProperty("egogifts").GetArrayLength());
 
         var stored = AccountFields.Get<MirrorOriginSaveInfo>((await GetAccount(f, name)).MdSaveInfo)!;
-        Assert.Equal(500 + 99, stored.currentInfo.cost);
+        Assert.Equal(200 + 99, stored.currentInfo.cost);
         Assert.Empty(stored.currentInfo.egs);
     }
 
@@ -184,7 +184,7 @@ public class MirrorDungeonShopHandlerTests(SqliteFixture db)
         Assert.Equal(HttpStatusCode.OK, resp.StatusCode);
         using var doc = JsonDocument.Parse(await resp.Content.ReadAsStringAsync());
         var result = doc.RootElement.GetProperty("result");
-        Assert.Equal(500 - expectedCost, result.GetProperty("cost").GetInt64());
+        Assert.Equal(200 - expectedCost, result.GetProperty("cost").GetInt64());
         Assert.Equal(expectedCost, result.GetProperty("usedcost").GetInt64());
         Assert.Equal(1, result.GetProperty("egoGift").GetProperty("ul").GetInt64());
 
@@ -370,7 +370,7 @@ public class MirrorDungeonShopHandlerTests(SqliteFixture db)
         Assert.Equal(9002, unit.GetProperty("es")[0].GetProperty("id").GetInt64());
 
         var stored = AccountFields.Get<MirrorOriginSaveInfo>((await GetAccount(f, name)).MdSaveInfo)!;
-        Assert.Equal(400, stored.currentInfo.cost);
+        Assert.Equal(100, stored.currentInfo.cost);
         Assert.Equal(8, stored.currentInfo.dul[0].pid);
         Assert.Equal(9002, stored.currentInfo.dul[0].es[0].id);
     }

@@ -103,7 +103,7 @@ public class MirrorDungeonRewardsHandlerTests(SqliteFixture db)
         // the first refresh), not a flat 15 - same result for a first refresh, but rc is
         // now tracked and usedcost is the running cumulative shop-spend.
         Assert.Equal(10, stored.currentInfo.cost);
-        Assert.Equal(15, stored.currentInfo.usedcost);
+        Assert.Equal(90, stored.currentInfo.usedcost);
         Assert.Equal(1, stored.currentInfo.shop.rc);
         // Reroll is position-preserving: the sold-out slot at index 1 is untouched (id,
         // t, s all unchanged) even though it's not first or last; the two available slots

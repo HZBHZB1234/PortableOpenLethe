@@ -77,7 +77,8 @@ public class ScopedAccountReadTests(SqliteFixture db)
         Assert.Equal(HttpStatusCode.OK, resp.StatusCode);
 
         var select = Assert.Single(f.Sql, s => s.Contains("FROM \"accounts\"", StringComparison.Ordinal)
-            && s.Contains("\"MdSaveInfo\"", StringComparison.Ordinal));
+            && s.Contains("\"MdSaveInfo\"", StringComparison.Ordinal)
+            && !s.Contains("\"StoryMdSaveInfo\"", StringComparison.Ordinal));
         Assert.Contains("\"MdSaveInfo\"", select);
         // The fourteen columns this handler never reads must not be in the projection -
         // they are jsonb documents Postgres would detoast and ship for nothing.

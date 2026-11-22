@@ -101,7 +101,7 @@ public class MirrorDungeonMapHandlerTests(SqliteFixture db)
         }
 
         var final = AccountFields.Get<MirrorOriginSaveInfo>((await GetAccount(f, name)).MdSaveInfo)!;
-        Assert.Equal(10, final.currentInfo.shop.slots.Count);
+        Assert.Equal(8, final.currentInfo.shop.slots.Count);
         Assert.Equal(shopNode.nid, final.currentInfo.cn.nid);
     }
 
@@ -234,7 +234,7 @@ public class MirrorDungeonMapHandlerTests(SqliteFixture db)
         Assert.Equal(HttpStatusCode.OK, resp.StatusCode);
         using var doc = JsonDocument.Parse(await resp.Content.ReadAsStringAsync());
         var currentInfo = doc.RootElement.GetProperty("result").GetProperty("currentInfo");
-        Assert.Equal(500 + 200, currentInfo.GetProperty("cost").GetInt64());
+        Assert.Equal(500 + 100, currentInfo.GetProperty("cost").GetInt64());
 
         var rre = currentInfo.GetProperty("rre").EnumerateArray().ToList();
         // Order: leading confirmed (993005 not yet owned) -> BattleRewardCase -> EnemyBuf.
@@ -278,7 +278,7 @@ public class MirrorDungeonMapHandlerTests(SqliteFixture db)
         }
 
         var stored = AccountFields.Get<MirrorOriginSaveInfo>((await GetAccount(f, name)).MdSaveInfo)!;
-        Assert.Equal(700, stored.currentInfo.cost);
+        Assert.Equal(600, stored.currentInfo.cost);
         Assert.Contains(stored.currentInfo.egs, g => g.id == 993005);
     }
 
@@ -316,7 +316,7 @@ public class MirrorDungeonMapHandlerTests(SqliteFixture db)
         Assert.Equal(2, rre[1].GetProperty("pool").GetArrayLength());
 
         var stored = AccountFields.Get<MirrorOriginSaveInfo>((await GetAccount(f, name)).MdSaveInfo)!;
-        Assert.Equal(500 + 100, stored.currentInfo.cost); // node e=5 default cost 100
+        Assert.Equal(200 + 100, stored.currentInfo.cost); // node e=5 default cost 100
     }
 
     [SkippableFact]

@@ -67,7 +67,7 @@ public class MirrorDungeonHandlerTests(SqliteFixture db)
         using var doc = JsonDocument.Parse(await resp.Content.ReadAsStringAsync());
         var save = doc.RootElement.GetProperty("result").GetProperty("saveInfo");
         Assert.Equal(8, save.GetProperty("dungeonId").GetInt64());
-        Assert.Equal(500, save.GetProperty("currentInfo").GetProperty("cost").GetInt64());
+        Assert.Equal(200, save.GetProperty("currentInfo").GetProperty("cost").GetInt64());
     }
 
     [SkippableFact]

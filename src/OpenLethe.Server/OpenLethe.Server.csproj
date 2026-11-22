@@ -22,6 +22,16 @@
     <ImplicitUsings>enable</ImplicitUsings>
   </PropertyGroup>
 
+  <!-- Running the published DLL directly needs wwwroot beside it, not just in the project. -->
+  <Target Name="CopyWwwRootToOutput" AfterTargets="Build">
+    <ItemGroup>
+      <_WwwRootFiles Include="$(MSBuildThisFileDirectory)wwwroot\**\*" />
+    </ItemGroup>
+    <Copy SourceFiles="@(_WwwRootFiles)"
+          DestinationFiles="@(_WwwRootFiles->'$(OutDir)wwwroot\%(RecursiveDir)%(Filename)%(Extension)')"
+          SkipUnchangedFiles="true" />
+  </Target>
+
   <!-- Static data is never embedded: place the whole tree beside the published exe. -->
   <Target Name="CopyStaticDataOnPublish" AfterTargets="Publish">
     <ItemGroup>

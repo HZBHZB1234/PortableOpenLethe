@@ -20,4 +20,14 @@
     <ImplicitUsings>enable</ImplicitUsings>
   </PropertyGroup>
 
+  <!-- Static data is never embedded: place the whole tree beside the published exe. -->
+  <Target Name="CopyStaticDataOnPublish" AfterTargets="Publish">
+    <ItemGroup>
+      <_StaticDataFiles Include="$(MSBuildThisFileDirectory)..\..\static\**\*" />
+    </ItemGroup>
+    <Copy SourceFiles="@(_StaticDataFiles)"
+          DestinationFiles="@(_StaticDataFiles->'$(PublishDir)static\%(RecursiveDir)%(Filename)%(Extension)')"
+          SkipUnchangedFiles="true" />
+  </Target>
+
 </Project>

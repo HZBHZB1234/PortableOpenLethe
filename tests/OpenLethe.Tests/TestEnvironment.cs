@@ -13,5 +13,17 @@ internal static class TestEnvironment
     {
         Environment.SetEnvironmentVariable("OPENLETHE_NO_DOTENV", "1");
         Environment.SetEnvironmentVariable("MD_STARLIGHT", "off");
+
+        // Portable build: static data is a sibling directory, never embedded.
+        // Find the repo-root `static/` by walking up from the test output folder.
+        var dir = new DirectoryInfo(AppContext.BaseDirectory);
+        for (var i = 0; i < 8 && dir is not null; i++, dir = dir.Parent)
+        {
+            if (Directory.Exists(Path.Combine(dir.FullName, "static", "StaticData")))
+            {
+                Environment.SetEnvironmentVariable("STATIC_DATA_DIR", Path.Combine(dir.FullName, "static"));
+                break;
+            }
+        }
     }
 }

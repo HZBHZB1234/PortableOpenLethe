@@ -15,6 +15,9 @@ modfiles/
 /.vs/OpenLethe
 /.vs
 
+# Publish output (rebuild with scripts/publish-portable.ps1)
+dist/
+
 # Portable local data
 data/
 *.db

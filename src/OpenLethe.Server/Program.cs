@@ -24,6 +24,18 @@ if (Environment.GetEnvironmentVariable("OPENLETHE_NO_DOTENV") is null)
 
 var builder = WebApplication.CreateBuilder(args);
 
+// LetheHub owns restart-required settings and writes them here before spawning us.
+// File values are additive; real environment variables still win.
+foreach (var bootstrap in new[]
+{
+    Path.Combine(AppContext.BaseDirectory, "data", "server.bootstrap.json"),
+    Path.Combine(Directory.GetCurrentDirectory(), "data", "server.bootstrap.json"),
+    Path.Combine(Directory.GetCurrentDirectory(), "server.bootstrap.json"),
+})
+{
+    if (File.Exists(bootstrap)) builder.Configuration.AddJsonFile(bootstrap, optional: true, reloadOnChange: false);
+}
+
 // Rust: RequestBodyLimitLayer::new(2 * 1024 * 1024). Kestrel's own default is 30MB,
 // which is a lot of memory to hand an unauthenticated caller once this is public.
 // Configurable so a large /custom/upload payload can be allowed without a code change.

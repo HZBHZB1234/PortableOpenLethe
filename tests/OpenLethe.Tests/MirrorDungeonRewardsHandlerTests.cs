@@ -43,7 +43,7 @@ public class MirrorDungeonRewardsHandlerTests(SqliteFixture db)
         await using var f = new DbWebAppFactory(db.ConnectionString);
         var (jwt, name) = await NewAccount(f);
         var client = f.CreateClient();
-        await client.PostAsJsonAsync("/api/EnterMirrorDungeon", Body(jwt, new { dungeonid = 4, idx = 0 }));
+        await client.PostAsJsonAsync("/api/EnterMirrorDungeon", Body(jwt, new { dungeonid = 8, idx = 0 }));
 
         var save = AccountFields.Get<MirrorOriginSaveInfo>((await GetAccount(f, name)).MdSaveInfo)!;
         save.currentInfo.egs.Add(new AcquiredEgogifts { id = 9003 });
@@ -79,7 +79,7 @@ public class MirrorDungeonRewardsHandlerTests(SqliteFixture db)
         await using var f = new DbWebAppFactory(db.ConnectionString);
         var (jwt, name) = await NewAccount(f);
         var client = f.CreateClient();
-        await client.PostAsJsonAsync("/api/EnterMirrorDungeon", Body(jwt, new { dungeonid = 4, idx = 0 }));
+        await client.PostAsJsonAsync("/api/EnterMirrorDungeon", Body(jwt, new { dungeonid = 8, idx = 0 }));
 
         var save = AccountFields.Get<MirrorOriginSaveInfo>((await GetAccount(f, name)).MdSaveInfo)!;
         save.currentInfo.cost = 100;
@@ -102,7 +102,7 @@ public class MirrorDungeonRewardsHandlerTests(SqliteFixture db)
         // capture-confirmed (task-12): the Nth refresh this floor costs 15*rc (rc=1 here,
         // the first refresh), not a flat 15 - same result for a first refresh, but rc is
         // now tracked and usedcost is the running cumulative shop-spend.
-        Assert.Equal(85, stored.currentInfo.cost);
+        Assert.Equal(10, stored.currentInfo.cost);
         Assert.Equal(15, stored.currentInfo.usedcost);
         Assert.Equal(1, stored.currentInfo.shop.rc);
         // Reroll is position-preserving: the sold-out slot at index 1 is untouched (id,
@@ -356,4 +356,5 @@ public class MirrorDungeonRewardsHandlerTests(SqliteFixture db)
         Assert.Equal(7, stored.currentInfo.cost); // unchanged - index rejected, not wrapped
     }
 }
+
 

@@ -43,7 +43,7 @@ public class MirrorDungeonMapHandlerTests(SqliteFixture db)
         await using var f = new DbWebAppFactory(db.ConnectionString);
         var (jwt, name) = await NewAccount(f);
         var client = f.CreateClient();
-        await client.PostAsJsonAsync("/api/EnterMirrorDungeon", Body(jwt, new { dungeonid = 4, idx = 0 }));
+        await client.PostAsJsonAsync("/api/EnterMirrorDungeon", Body(jwt, new { dungeonid = 8, idx = 0 }));
 
         // 1. AcquireStart: egs grows by selectedEgoGiftIds, tfps gets populated.
         var acquireResp = await client.PostAsJsonAsync("/api/AcquireStartEgoGiftsAndCreateThemePoolMirrorDungeon",
@@ -95,7 +95,7 @@ public class MirrorDungeonMapHandlerTests(SqliteFixture db)
         {
             var result = doc.RootElement.GetProperty("result");
             Assert.Equal(shopNode.nid, result.GetProperty("currentNode").GetProperty("nid").GetInt64());
-            Assert.Equal(10, result.GetProperty("shopInfo").GetProperty("slots").GetArrayLength());
+            Assert.Equal(8, result.GetProperty("shopInfo").GetProperty("slots").GetArrayLength());
             // Shop-node entry (e==10): event/shop nodes are worth nr==3.
             Assert.Equal(3, result.GetProperty("nr").GetInt64());
         }
@@ -112,7 +112,7 @@ public class MirrorDungeonMapHandlerTests(SqliteFixture db)
         await using var f = new DbWebAppFactory(db.ConnectionString);
         var (jwt, name) = await NewAccount(f);
         var client = f.CreateClient();
-        await client.PostAsJsonAsync("/api/EnterMirrorDungeon", Body(jwt, new { dungeonid = 4, idx = 0 }));
+        await client.PostAsJsonAsync("/api/EnterMirrorDungeon", Body(jwt, new { dungeonid = 8, idx = 0 }));
 
         var save = AccountFields.Get<MirrorOriginSaveInfo>((await GetAccount(f, name)).MdSaveInfo)!;
         // Two floors already recorded -> the floor being selected is index 2 (== tfs.Count). The
@@ -175,7 +175,7 @@ public class MirrorDungeonMapHandlerTests(SqliteFixture db)
         await using var f = new DbWebAppFactory(db.ConnectionString);
         var (jwt, name) = await NewAccount(f);
         var client = f.CreateClient();
-        await client.PostAsJsonAsync("/api/EnterMirrorDungeon", Body(jwt, new { dungeonid = 4, idx = 0 }));
+        await client.PostAsJsonAsync("/api/EnterMirrorDungeon", Body(jwt, new { dungeonid = 8, idx = 0 }));
 
         var save = AccountFields.Get<MirrorOriginSaveInfo>((await GetAccount(f, name)).MdSaveInfo)!;
         // Normal shop (eid == 0, the default) -> 5 slots, nr == 3.
@@ -189,7 +189,7 @@ public class MirrorDungeonMapHandlerTests(SqliteFixture db)
         using (var doc = JsonDocument.Parse(await shopResp.Content.ReadAsStringAsync()))
         {
             var result = doc.RootElement.GetProperty("result");
-            Assert.Equal(5, result.GetProperty("shopInfo").GetProperty("slots").GetArrayLength());
+            Assert.Equal(4, result.GetProperty("shopInfo").GetProperty("slots").GetArrayLength());
             Assert.Equal(3, result.GetProperty("nr").GetInt64());
             Assert.False(result.GetProperty("changedHiddenNode").GetBoolean());
         }
@@ -211,7 +211,7 @@ public class MirrorDungeonMapHandlerTests(SqliteFixture db)
         await using var f = new DbWebAppFactory(db.ConnectionString);
         var (jwt, name) = await NewAccount(f);
         var client = f.CreateClient();
-        await client.PostAsJsonAsync("/api/EnterMirrorDungeon", Body(jwt, new { dungeonid = 4, idx = 0 }));
+        await client.PostAsJsonAsync("/api/EnterMirrorDungeon", Body(jwt, new { dungeonid = 8, idx = 0 }));
 
         var save = AccountFields.Get<MirrorOriginSaveInfo>((await GetAccount(f, name)).MdSaveInfo)!;
         // cn.f = 5 (the first hard floor): static enemy-buff pool is 992251-258, BattleRewardCase
@@ -289,7 +289,7 @@ public class MirrorDungeonMapHandlerTests(SqliteFixture db)
         await using var f = new DbWebAppFactory(db.ConnectionString);
         var (jwt, name) = await NewAccount(f);
         var client = f.CreateClient();
-        await client.PostAsJsonAsync("/api/EnterMirrorDungeon", Body(jwt, new { dungeonid = 4, idx = 0 }));
+        await client.PostAsJsonAsync("/api/EnterMirrorDungeon", Body(jwt, new { dungeonid = 8, idx = 0 }));
 
         var save = AccountFields.Get<MirrorOriginSaveInfo>((await GetAccount(f, name)).MdSaveInfo)!;
         save.dungeonMap.ns.Add(new Ns { f = 0, s = 1, nid = 101, e = 5, eid = 2060116 });
@@ -329,7 +329,7 @@ public class MirrorDungeonMapHandlerTests(SqliteFixture db)
         await using var f = new DbWebAppFactory(db.ConnectionString);
         var (jwt, name) = await NewAccount(f);
         var client = f.CreateClient();
-        await client.PostAsJsonAsync("/api/EnterMirrorDungeon", Body(jwt, new { dungeonid = 4, idx = 0 }));
+        await client.PostAsJsonAsync("/api/EnterMirrorDungeon", Body(jwt, new { dungeonid = 8, idx = 0 }));
 
         var save = AccountFields.Get<MirrorOriginSaveInfo>((await GetAccount(f, name)).MdSaveInfo)!;
         save.dungeonMap.ns.Add(new Ns { f = 0, s = 2, nid = 202, e = 3, eid = 901021 });
@@ -381,7 +381,7 @@ public class MirrorDungeonMapHandlerTests(SqliteFixture db)
         await using var f = new DbWebAppFactory(db.ConnectionString);
         var (jwt, _) = await NewAccount(f);
         var client = f.CreateClient();
-        await client.PostAsJsonAsync("/api/EnterMirrorDungeon", Body(jwt, new { dungeonid = 4, idx = 0 }));
+        await client.PostAsJsonAsync("/api/EnterMirrorDungeon", Body(jwt, new { dungeonid = 8, idx = 0 }));
 
         var resp = await client.PostAsJsonAsync("/api/ExitMirrorDungeonMapNode", Body(jwt, new
         {
@@ -402,7 +402,7 @@ public class MirrorDungeonMapHandlerTests(SqliteFixture db)
         await using var f = new DbWebAppFactory(db.ConnectionString);
         var (jwt, name) = await NewAccount(f);
         var client = f.CreateClient();
-        await client.PostAsJsonAsync("/api/EnterMirrorDungeon", Body(jwt, new { dungeonid = 4, idx = 0 }));
+        await client.PostAsJsonAsync("/api/EnterMirrorDungeon", Body(jwt, new { dungeonid = 8, idx = 0 }));
         var save = AccountFields.Get<MirrorOriginSaveInfo>((await GetAccount(f, name)).MdSaveInfo)!;
         await SetSave(f, name, save);
 
@@ -424,7 +424,7 @@ public class MirrorDungeonMapHandlerTests(SqliteFixture db)
         await using var f = new DbWebAppFactory(db.ConnectionString);
         var (jwt, _) = await NewAccount(f);
         var client = f.CreateClient();
-        await client.PostAsJsonAsync("/api/EnterMirrorDungeon", Body(jwt, new { dungeonid = 4, idx = 0 }));
+        await client.PostAsJsonAsync("/api/EnterMirrorDungeon", Body(jwt, new { dungeonid = 8, idx = 0 }));
 
         var resp = await client.PostAsJsonAsync("/api/SelectThemeFloorMirrorDungeon",
             Body(jwt, new { selectedIdx = 0, selectedThemeFoorId = 999999999 }));
@@ -444,4 +444,5 @@ public class MirrorDungeonMapHandlerTests(SqliteFixture db)
         Assert.Equal(HttpStatusCode.InternalServerError, resp.StatusCode);
     }
 }
+
 

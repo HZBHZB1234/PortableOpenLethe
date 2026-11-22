@@ -44,7 +44,7 @@ public class MirrorDungeonEventsHandlerTests(SqliteFixture db)
         await using var f = new DbWebAppFactory(db.ConnectionString);
         var (jwt, name) = await NewAccount(f);
         var client = f.CreateClient();
-        await client.PostAsJsonAsync("/api/EnterMirrorDungeon", Body(jwt, new { dungeonid = 4, idx = 0 }));
+        await client.PostAsJsonAsync("/api/EnterMirrorDungeon", Body(jwt, new { dungeonid = 8, idx = 0 }));
 
         var save = AccountFields.Get<MirrorOriginSaveInfo>((await GetAccount(f, name)).MdSaveInfo)!;
         save.dungeonMap.ns.Add(new Ns { f = 0, s = 1, nid = 101, e = 1, eid = 800201 });
@@ -86,7 +86,7 @@ public class MirrorDungeonEventsHandlerTests(SqliteFixture db)
         await using var f = new DbWebAppFactory(db.ConnectionString);
         var (jwt, name) = await NewAccount(f);
         var client = f.CreateClient();
-        await client.PostAsJsonAsync("/api/EnterMirrorDungeon", Body(jwt, new { dungeonid = 4, idx = 0 }));
+        await client.PostAsJsonAsync("/api/EnterMirrorDungeon", Body(jwt, new { dungeonid = 8, idx = 0 }));
 
         var save = AccountFields.Get<MirrorOriginSaveInfo>((await GetAccount(f, name)).MdSaveInfo)!;
         // No matching dungeonMap node - only the pce.nei path can resolve the event id.
@@ -123,7 +123,7 @@ public class MirrorDungeonEventsHandlerTests(SqliteFixture db)
         await using var f = new DbWebAppFactory(db.ConnectionString);
         var (jwt, name) = await NewAccount(f);
         var client = f.CreateClient();
-        await client.PostAsJsonAsync("/api/EnterMirrorDungeon", Body(jwt, new { dungeonid = 4, idx = 0 }));
+        await client.PostAsJsonAsync("/api/EnterMirrorDungeon", Body(jwt, new { dungeonid = 8, idx = 0 }));
 
         var save = AccountFields.Get<MirrorOriginSaveInfo>((await GetAccount(f, name)).MdSaveInfo)!;
         save.dungeonMap.ns.Add(new Ns { f = 0, s = 1, nid = 202, e = 1, eid = 90107402 });
@@ -177,7 +177,7 @@ public class MirrorDungeonEventsHandlerTests(SqliteFixture db)
         await using var f = new DbWebAppFactory(db.ConnectionString);
         var (jwt, name) = await NewAccount(f);
         var client = f.CreateClient();
-        await client.PostAsJsonAsync("/api/EnterMirrorDungeon", Body(jwt, new { dungeonid = 4, idx = 0 }));
+        await client.PostAsJsonAsync("/api/EnterMirrorDungeon", Body(jwt, new { dungeonid = 8, idx = 0 }));
 
         var save = AccountFields.Get<MirrorOriginSaveInfo>((await GetAccount(f, name)).MdSaveInfo)!;
         save.currentInfo.pce.Clear();
@@ -194,4 +194,5 @@ public class MirrorDungeonEventsHandlerTests(SqliteFixture db)
         Assert.Equal(HttpStatusCode.InternalServerError, resp.StatusCode);
     }
 }
+
 

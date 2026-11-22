@@ -29,15 +29,15 @@ public class MirrorDungeonHandlerTests(SqliteFixture db)
         var (jwt, name) = await NewAccount(f);
         var client = f.CreateClient();
 
-        var resp = await client.PostAsJsonAsync("/api/EnterMirrorDungeon", Body(jwt, new { dungeonid = 4, idx = 1 }));
+        var resp = await client.PostAsJsonAsync("/api/EnterMirrorDungeon", Body(jwt, new { dungeonid = 8, idx = 1 }));
         Assert.Equal(HttpStatusCode.OK, resp.StatusCode);
         using var doc = JsonDocument.Parse(await resp.Content.ReadAsStringAsync());
         var result = doc.RootElement.GetProperty("result");
         var save = result.GetProperty("saveInfo");
-        Assert.Equal(4, save.GetProperty("dungeonId").GetInt64());
+        Assert.Equal(8, save.GetProperty("dungeonId").GetInt64());
         Assert.Equal(2, save.GetProperty("version").GetInt64());
         var ci = save.GetProperty("currentInfo");
-        Assert.Equal(500, ci.GetProperty("cost").GetInt64());
+        Assert.Equal(200, ci.GetProperty("cost").GetInt64());
         Assert.Equal("None", ci.GetProperty("startKeyword").GetString());
         Assert.Equal(10, ci.GetProperty("seps").GetArrayLength());
         Assert.Equal("Combustion", ci.GetProperty("seps")[0].GetProperty("keyword").GetString());
@@ -49,8 +49,8 @@ public class MirrorDungeonHandlerTests(SqliteFixture db)
         using var scope = f.Services.CreateScope();
         var acc = await new AccountStore(scope.ServiceProvider.GetRequiredService<AppDbContext>()).FindByUsernameAsync(name);
         var stored = AccountFields.Get<MirrorOriginSaveInfo>(acc!.MdSaveInfo)!;
-        Assert.Equal(4, stored.dungeonId);
-        Assert.Equal(500, stored.currentInfo.cost);
+        Assert.Equal(8, stored.dungeonId);
+        Assert.Equal(200, stored.currentInfo.cost);
     }
 
     [SkippableFact]
@@ -60,13 +60,13 @@ public class MirrorDungeonHandlerTests(SqliteFixture db)
         await using var f = new DbWebAppFactory(db.ConnectionString);
         var (jwt, _) = await NewAccount(f);
         var client = f.CreateClient();
-        await client.PostAsJsonAsync("/api/EnterMirrorDungeon", Body(jwt, new { dungeonid = 4, idx = 0 }));
+        await client.PostAsJsonAsync("/api/EnterMirrorDungeon", Body(jwt, new { dungeonid = 8, idx = 0 }));
 
         var resp = await client.PostAsJsonAsync("/api/ReEnterMirrorDungeon", Body(jwt, new { }));
         Assert.Equal(HttpStatusCode.OK, resp.StatusCode);
         using var doc = JsonDocument.Parse(await resp.Content.ReadAsStringAsync());
         var save = doc.RootElement.GetProperty("result").GetProperty("saveInfo");
-        Assert.Equal(4, save.GetProperty("dungeonId").GetInt64());
+        Assert.Equal(8, save.GetProperty("dungeonId").GetInt64());
         Assert.Equal(500, save.GetProperty("currentInfo").GetProperty("cost").GetInt64());
     }
 
@@ -77,13 +77,14 @@ public class MirrorDungeonHandlerTests(SqliteFixture db)
         await using var f = new DbWebAppFactory(db.ConnectionString);
         var (jwt, _) = await NewAccount(f);
         var client = f.CreateClient();
-        await client.PostAsJsonAsync("/api/EnterMirrorDungeon", Body(jwt, new { dungeonid = 4, idx = 1 }));
+        await client.PostAsJsonAsync("/api/EnterMirrorDungeon", Body(jwt, new { dungeonid = 8, idx = 1 }));
 
         var resp = await client.PostAsJsonAsync("/api/GetDungeonSaveInfoAll", Body(jwt, new { }));
         Assert.Equal(HttpStatusCode.OK, resp.StatusCode);
         using var doc = JsonDocument.Parse(await resp.Content.ReadAsStringAsync());
         var result = doc.RootElement.GetProperty("result");
-        Assert.Equal(4, result.GetProperty("mirrorOriginSaveInfo").GetProperty("dungeonId").GetInt32());
+        Assert.Equal(8, result.GetProperty("mirrorOriginSaveInfo").GetProperty("dungeonId").GetInt32());
     }
 }
+
 

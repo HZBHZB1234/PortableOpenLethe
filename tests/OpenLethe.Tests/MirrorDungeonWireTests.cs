@@ -8,7 +8,7 @@ public class MirrorDungeonWireTests
     {
         var save = new MirrorOriginSaveInfo
         {
-            dungeonId = 4,
+            dungeonId = 8,
             idx = 1,
             version = 2,
             encounterstatistics = new List<long> { 0, 0, 0 },
@@ -27,7 +27,7 @@ public class MirrorDungeonWireTests
         var json = JsonSerializer.Serialize(save, global::PacketJson.Options);
         using var doc = JsonDocument.Parse(json);
         var root = doc.RootElement;
-        Assert.Equal(4, root.GetProperty("dungeonId").GetInt64());
+        Assert.Equal(8, root.GetProperty("dungeonId").GetInt64());
         Assert.Equal(2, root.GetProperty("version").GetInt64());
         var ci = root.GetProperty("currentInfo");
         Assert.Equal(500, ci.GetProperty("cost").GetInt64());
@@ -44,3 +44,4 @@ public class MirrorDungeonWireTests
         Assert.Single(back.currentInfo.seps);
     }
 }
+

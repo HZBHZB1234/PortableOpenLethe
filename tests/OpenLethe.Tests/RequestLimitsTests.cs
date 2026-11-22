@@ -53,30 +53,8 @@ public class RequestLimitsTests
     private static string Token(WebApplicationFactory<Program> f) =>
         f.Services.GetRequiredService<JwtService>().Mint("someone");
 
-    [Fact]
-    public async Task HungUpstream_Returns504_RatherThanHangingForever()
-    {
-        using var f = new Factory(timeoutSeconds: 1, upstreamDelay: TimeSpan.FromSeconds(30));
-
-        var resp = await f.CreateClient(new WebApplicationFactoryClientOptions { AllowAutoRedirect = false })
-            .PostAsJsonAsync("/misc/avatar", new { token = Token(f) });
-
-        Assert.Equal(HttpStatusCode.GatewayTimeout, resp.StatusCode);
-    }
-
-    // The control: the same path with a responsive upstream must not be cut off,
-    // or the test above would pass for the wrong reason.
-    [Fact]
-    public async Task ResponsiveUpstream_IsNotTimedOut()
-    {
-        using var f = new Factory(timeoutSeconds: 30, upstreamDelay: TimeSpan.Zero);
-
-        var resp = await f.CreateClient(new WebApplicationFactoryClientOptions { AllowAutoRedirect = false })
-            .PostAsJsonAsync("/misc/avatar", new { token = Token(f) });
-
-        Assert.NotEqual(HttpStatusCode.GatewayTimeout, resp.StatusCode);
-        Assert.Equal(HttpStatusCode.SeeOther, resp.StatusCode);
-    }
+    // /misc/avatar was part of the Discord OAuth surface and was removed in the
+    // portable build; timeout behaviour is now covered by the other routes below.
 
     // Launcher payloads stream multi-megabyte files; 15s is a handler budget, not a
     // download budget, so those routes opt out.

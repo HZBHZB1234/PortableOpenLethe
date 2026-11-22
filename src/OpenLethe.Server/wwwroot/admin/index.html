@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8"><title>Portable Lethe — Administration</title>
+<style>
+body{background:#141428;color:#ddd;font-family:system-ui;margin:0;padding:2rem}
+h1{color:#8c9eff} table{border-collapse:collapse;width:100%;margin:1rem 0}
+th,td{border:1px solid #333;padding:.5rem;text-align:left}
+input,button,select{background:#222;color:#ddd;border:1px solid #444;padding:.4rem;margin:.2rem}
+button{cursor:pointer} .card{background:#1e1e36;padding:1rem;border-radius:6px;margin-bottom:1rem}
+pre{white-space:pre-wrap;word-break:break-all}
+</style>
+</head>
+<body>
+<h1>Portable Lethe — Administration</h1>
+<div class="card">
+  <h3>Login</h3>
+  <input id="password" type="password" placeholder="admin password">
+  <button onclick="login()">Sign in</button>
+  <span id="status"></span>
+</div>
+<div class="card">
+  <h3>Accounts</h3>
+  <button onclick="loadAccounts()">Refresh</button>
+  <input id="newName" placeholder="new username">
+  <button onclick="createAccount()">Create</button>
+  <table><thead><tr><th>IngameId</th><th>Username</th><th>DiscordId</th><th>Created</th><th>Actions</th></tr></thead>
+  <tbody id="rows"></tbody></table>
+</div>
+<div class="card">
+  <h3>Edit account document</h3>
+  <input id="docUser" placeholder="username">
+  <select id="docField">
+    <option>UserInfo</option><option>Formations</option><option>Egos</option><option>Personalities</option>
+    <option>MdSaveInfo</option><option>StorySaveInfo</option><option>ChapterState</option>
+  </select>
+  <textarea id="docValue" rows="6" style="width:100%">{}</textarea>
+  <button onclick="saveDoc()">Save document</button>
+</div>
+<pre id="output"></pre>
+<script>
+let token = '';
+async function call(path, body) {
+  const res = await fetch(path, {method:'POST', headers:{'Content-Type':'application/json'},
+    body: JSON.stringify({...body, token})});
+  const text = await res.text();
+  document.getElementById('output').textContent = res.status + ' ' + text.slice(0,2000);
+  return {ok: res.ok, data: (()=>{try{return JSON.parse(text)}catch{return null}})()};
+}
+async function login(){
+  const r = await fetch('/admin/login',{method:'POST',headers:{'Content-Type':'application/json'},
+    body:JSON.stringify({password:document.getElementById('password').value})});
+  const d = await r.json().catch(()=>({}));
+  if(r.ok){ token=d.token; document.getElementById('status').textContent='authenticated'; loadAccounts(); }
+  else document.getElementById('status').textContent='login failed';
+}
+async function loadAccounts(){
+  const r = await call('/admin/accounts',{});
+  if(!r.ok||!r.data) return;
+  document.getElementById('rows').innerHTML = r.data.accounts.map(a=>
+    `<tr><td>${a.ingameId}</td><td>${a.username}</td><td>${a.discordId||''}</td><td>${a.createdAt}</td>
+     <td><button onclick="del('${a.username}')">Delete</button></td></tr>`).join('');
+}
+async function createAccount(){
+  await call('/admin/accounts/create',{username:document.getElementById('newName').value});
+  loadAccounts();
+}
+async function del(name){ if(confirm('Delete '+name+'?')){ await call('/admin/accounts/delete',{username:name}); loadAccounts(); } }
+async function saveDoc(){
+  await call('/admin/accounts/document',{username:document.getElementById('docUser').value,
+    field:document.getElementById('docField').value, value:document.getElementById('docValue').value});
+}
+</script>
+</body>
+</html>

@@ -28,6 +28,15 @@ public sealed class JwtService(string secret, TimeSpan lifetime)
     public string MintProfile(string sub, string name, string avatar) =>
         Mint(new PayloadDto { sub = sub, name = name, avatar = avatar }, lifetime);
 
+    /// Portable local login token. Carries the same display claims the launcher
+    /// reads from the JWT (sub / name / avatar).
+    public string MintLocal(string sub, string name, string avatar) =>
+        MintProfile(sub, name, avatar);
+
+    /// Short-lived admin token for the local management panel.
+    public string MintAdmin(string sub) =>
+        Mint(new PayloadDto { sub = sub, admin = true }, TimeSpan.FromHours(8));
+
     /// Rust create_captcha_jwt: 30-minute abuse_exemption cookie proving the
     /// holder passed Turnstile. Only /misc/locale* reads it.
     public string MintCaptcha(string sub) =>
@@ -57,7 +66,7 @@ public sealed class JwtService(string secret, TimeSpan lifetime)
 
     public bool TryVerifyClaims(string token, out JwtClaims claims)
     {
-        claims = new JwtClaims("", "", "", false, false);
+        claims = new JwtClaims("", "", "", false, false, false);
         if (string.IsNullOrEmpty(token)) return false;
 
         var parts = token.Split('.');
@@ -76,7 +85,7 @@ public sealed class JwtService(string secret, TimeSpan lifetime)
         if (payload.exp <= DateTimeOffset.UtcNow.ToUnixTimeSeconds()) return false;
 
         claims = new JwtClaims(payload.sub, payload.name ?? "", payload.avatar ?? "",
-            payload.eph, payload.captcha);
+            payload.eph, payload.captcha, payload.admin);
         return true;
     }
 
@@ -115,10 +124,12 @@ public sealed class JwtService(string secret, TimeSpan lifetime)
         public string? avatar { get; set; }
         [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
         public bool captcha { get; set; }
+        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
+        public bool admin { get; set; }
     }
 }
 
 /// Verified payload. Mirrors Rust middleware::jwt::Claims minus `exp`, which
 /// TryVerify has already enforced by the time a caller sees this.
 public readonly record struct JwtClaims(
-    string Sub, string Name, string Avatar, bool Ephemeral, bool Captcha);
+    string Sub, string Name, string Avatar, bool Ephemeral, bool Captcha, bool Admin = false);

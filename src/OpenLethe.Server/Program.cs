@@ -178,8 +178,10 @@ app.Use(async (ctx, next) =>
 app.MapGet("/health", () => "ok");
 
 app.MapModFiles();   // /Lethe.dll etc - LetheLauncher fetches these before launch
+app.UseStaticFiles();
 app.MapAuth();
-app.MapDiscordAuth();
+app.MapAdmin();
+app.MapHub();
 app.MapLocale();
 app.MapDashboard();
 app.MapCustomUpload();
@@ -210,3 +212,6 @@ app.Run();
 
 // Exposed so WebApplicationFactory<Program> can find the entry point.
 public partial class Program { }
+
+
+

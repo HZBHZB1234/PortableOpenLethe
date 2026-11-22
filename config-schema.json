@@ -1,0 +1,18 @@
+{
+  "schemaVersion": 1,
+  "keys": [
+    { "key": "ASPNETCORE_URLS", "type": "string", "default": "http://127.0.0.1:5055", "requiresRestart": true, "owner": "hub" },
+    { "key": "ConnectionStrings:Local", "type": "string", "default": "Data Source=data/openlethe.db", "requiresRestart": true, "owner": "hub" },
+    { "key": "Auth:JwtSecret", "type": "secret", "default": "", "requiresRestart": true, "owner": "hub" },
+    { "key": "Auth:RateLimitPerMinute", "type": "int", "default": 600, "requiresRestart": true, "owner": "hub" },
+    { "key": "MAX_REQUEST_BODY_BYTES", "type": "int", "default": 2097152, "requiresRestart": true, "owner": "hub" },
+    { "key": "REQUEST_TIMEOUT_SECONDS", "type": "double", "default": 15, "requiresRestart": true, "owner": "hub" },
+    { "key": "STATIC_DATA_DIR", "type": "string", "default": "static", "requiresRestart": true, "owner": "hub" },
+    { "key": "MOD_FILES_DIR", "type": "string", "default": "modfiles", "requiresRestart": true, "owner": "hub" },
+    { "key": "Plugins:Enabled", "type": "bool", "default": false, "requiresRestart": true, "owner": "hub" },
+    { "key": "Plugins:Dir", "type": "string", "default": "plugins", "requiresRestart": true, "owner": "hub" },
+    { "key": "Scripts:Enabled", "type": "bool", "default": true, "requiresRestart": false, "owner": "server" },
+    { "key": "Auth:EnableLocalLogin", "type": "bool", "default": true, "requiresRestart": false, "owner": "server" },
+    { "key": "Admin:Password", "type": "secret", "default": "", "requiresRestart": false, "owner": "server" }
+  ]
+}

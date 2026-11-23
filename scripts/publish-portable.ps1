@@ -19,7 +19,10 @@ $project = Join-Path $root 'src\OpenLethe.Server\OpenLethe.Server.csproj'
 $out = [IO.Path]::GetFullPath($OutDir)
 
 Write-Host "Publishing to $out"
-& dotnet publish $project -c $Configuration -o $out
+# Self-contained: the private-server host may not have the matching .NET
+# runtime installed (e.g. only .NET 10 on a machine that targets net9.0).
+& dotnet publish $project -c $Configuration -r win-x64 --self-contained true `
+    -p:PublishSingleFile=false -p:IncludeNativeLibrariesForSelfExtract=true -o $out
 if ($LASTEXITCODE -ne 0) { throw "dotnet publish failed" }
 
 foreach ($dir in @('modfiles', 'plugins', 'data')) {

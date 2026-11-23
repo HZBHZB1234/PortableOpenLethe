@@ -72,6 +72,10 @@ public sealed class JwtAuthMiddleware(RequestDelegate next, JwtService jwt)
         return s.StartsWith("/login/", StringComparison.OrdinalIgnoreCase)
             || s.StartsWith("/auth/", StringComparison.OrdinalIgnoreCase)
             || s.StartsWith("/dashboard/", StringComparison.OrdinalIgnoreCase)
+            // Admin panel and Hub control endpoints authenticate themselves
+            // (admin JWT / X-Hub-Token) and use plain JSON bodies.
+            || s.StartsWith("/admin", StringComparison.OrdinalIgnoreCase)
+            || s.StartsWith("/hub/", StringComparison.OrdinalIgnoreCase)
             // /misc carries its token in the body or the abuse_exemption cookie,
             // never in a userAuth envelope; Rust hangs it off the outer router too.
             || s.StartsWith("/misc/", StringComparison.OrdinalIgnoreCase)

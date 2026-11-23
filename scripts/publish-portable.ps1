@@ -2,8 +2,7 @@
 <#
   Publishes the portable server layout:
     dist/portable/
-      OpenLethe.Server(.exe) + DLLs
-      static/       - runtime static data (never embedded)
+      OpenLethe.Server(.exe) + DLLs   (framework-dependent, expects .NET 9/10)
       modfiles/     - launcher-served client DLLs (copy your own)
       plugins/      - admin-installed DLL plugins
       data/         - SQLite DB, admin secret, logs (created on first run)
@@ -18,11 +17,11 @@ $root = Split-Path -Parent $PSScriptRoot
 $project = Join-Path $root 'src\OpenLethe.Server\OpenLethe.Server.csproj'
 $out = [IO.Path]::GetFullPath($OutDir)
 
-Write-Host "Publishing to $out"
-# Self-contained: the private-server host may not have the matching .NET
-# runtime installed (e.g. only .NET 10 on a machine that targets net9.0).
-& dotnet publish $project -c $Configuration -r win-x64 --self-contained true `
-    -p:PublishSingleFile=false -p:IncludeNativeLibrariesForSelfExtract=true -o $out
+Write-Host "Publishing (framework-dependent) to $out"
+# Program and static resources are decoupled: static/ ships as a separate zip.
+# RollForward=Major in the csproj lets a newer installed runtime host this app.
+& dotnet publish $project -c $Configuration --no-self-contained `
+    -p:IncludeStaticData=false -o $out
 if ($LASTEXITCODE -ne 0) { throw "dotnet publish failed" }
 
 foreach ($dir in @('modfiles', 'plugins', 'data')) {

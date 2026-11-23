@@ -26,6 +26,8 @@
     <TargetFramework>net9.0</TargetFramework>
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
+    <!-- Allow a host with a newer runtime (e.g. .NET 10) to run this net9 app. -->
+    <RollForward>Major</RollForward>
   </PropertyGroup>
 
   <!-- Running the published DLL directly needs wwwroot beside it, not just in the project. -->
@@ -38,8 +40,9 @@
           SkipUnchangedFiles="true" />
   </Target>
 
-  <!-- Static data is never embedded: place the whole tree beside the published exe. -->
-  <Target Name="CopyStaticDataOnPublish" AfterTargets="Publish">
+  <!-- Static data is a separate release artifact. Only opt in explicitly when
+       building the legacy all-in-one package (-p:IncludeStaticData=true). -->
+  <Target Name="CopyStaticDataOnPublish" AfterTargets="Publish" Condition="'$(IncludeStaticData)' == 'true'">
     <ItemGroup>
       <_StaticDataFiles Include="$(MSBuildThisFileDirectory)..\..\static\**\*" />
     </ItemGroup>

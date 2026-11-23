@@ -1,75 +1,334 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="zh-CN">
 <head>
-<meta charset="utf-8"><title>Portable Lethe — Administration</title>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Portable Lethe · 管理控制台</title>
 <style>
-body{background:#141428;color:#ddd;font-family:system-ui;margin:0;padding:2rem}
-h1{color:#8c9eff} table{border-collapse:collapse;width:100%;margin:1rem 0}
-th,td{border:1px solid #333;padding:.5rem;text-align:left}
-input,button,select{background:#222;color:#ddd;border:1px solid #444;padding:.4rem;margin:.2rem}
-button{cursor:pointer} .card{background:#1e1e36;padding:1rem;border-radius:6px;margin-bottom:1rem}
-pre{white-space:pre-wrap;word-break:break-all}
+  :root {
+    --canvas: #f8fafc; --surface: #ffffff; --subtle: #f1f5f9;
+    --border: #e2e8f0; --border-strong: #cbd5e1;
+    --text: #0f172a; --muted: #475569; --faint: #94a3b8;
+    --accent: #5e6ad2; --accent-hover: #4a56c0; --accent-soft: #eef0fb;
+    --ok-fg: #15803d; --ok-bg: #dcfce7; --ok-bd: #86efac;
+    --err-fg: #b91c1c; --err-bg: #fee2e2; --err-bd: #fca5a5;
+    --warn-fg: #a16207; --warn-bg: #fef9c3; --warn-bd: #fde68a;
+    --radius: 8px; --radius-sm: 6px;
+    --shadow-sm: 0 1px 2px rgba(15,23,42,.05), 0 1px 3px rgba(15,23,42,.06);
+    --shadow-lg: 0 4px 6px -2px rgba(15,23,42,.05), 0 10px 15px -3px rgba(15,23,42,.08);
+    --font: "Inter", "Geist", -apple-system, BlinkMacSystemFont, "Segoe UI", system-ui, sans-serif;
+    --mono: "JetBrains Mono", "Geist Mono", "SF Mono", Consolas, ui-monospace, monospace;
+  }
+  * { box-sizing: border-box; }
+  html { -webkit-font-smoothing: antialiased; }
+  body { margin: 0; background: var(--canvas); color: var(--text); font: 14px/1.5 var(--font); }
+  button, input, select, textarea { font: inherit; }
+  button { cursor: pointer; }
+  h1, h2, h3, p { margin: 0; }
+  h1 { font-size: 20px; font-weight: 600; letter-spacing: -.01em; }
+  h2 { font-size: 15px; font-weight: 600; }
+  h3 { font-size: 13px; font-weight: 600; }
+  .muted { color: var(--muted); }
+  .faint { color: var(--faint); }
+  .mono { font-family: var(--mono); font-variant-numeric: tabular-nums; }
+
+  /* auth */
+  #auth-view { min-height: 100vh; display: grid; place-items: center; padding: 24px; }
+  .auth-card { width: 100%; max-width: 380px; background: var(--surface); border: 1px solid var(--border);
+               border-radius: 12px; padding: 32px; box-shadow: var(--shadow-lg); }
+  .brand { display: flex; align-items: center; gap: 12px; margin-bottom: 28px; }
+  .brand-mark { width: 36px; height: 36px; border-radius: 8px; background: var(--accent); color: #fff;
+                display: grid; place-items: center; font-weight: 600; font-size: 14px; letter-spacing: -.02em; }
+  .brand-name { font-size: 15px; font-weight: 600; }
+  .brand-sub { font-size: 12px; color: var(--faint); }
+  .auth-card h2 { margin-bottom: 6px; font-size: 18px; }
+  .auth-card p { font-size: 13px; color: var(--muted); margin-bottom: 24px; }
+  label.field { display: block; margin-bottom: 16px; }
+  label.field > span { display: block; font-size: 12px; font-weight: 500; color: var(--muted); margin-bottom: 6px; }
+  input, select, textarea { width: 100%; padding: 9px 12px; border: 1px solid var(--border-strong);
+    border-radius: var(--radius-sm); background: var(--surface); color: var(--text); outline: none;
+    transition: border-color .15s ease-out, box-shadow .15s ease-out; }
+  input:focus, select:focus, textarea:focus { border-color: var(--accent); box-shadow: 0 0 0 3px rgba(94,106,210,.18); }
+  textarea { resize: vertical; min-height: 130px; font-family: var(--mono); font-size: 12px; }
+  .btn { display: inline-flex; align-items: center; justify-content: center; gap: 6px;
+    height: 34px; padding: 0 14px; border-radius: var(--radius-sm); border: 1px solid transparent;
+    font-size: 13px; font-weight: 500; transition: background-color .15s ease-out, border-color .15s ease-out; }
+  .btn-primary { background: var(--accent); color: #fff; }
+  .btn-primary:hover { background: var(--accent-hover); }
+  .btn-secondary { background: var(--surface); border-color: var(--border-strong); color: var(--text); }
+  .btn-secondary:hover { background: var(--subtle); }
+  .btn-ghost { background: transparent; color: var(--muted); }
+  .btn-ghost:hover { background: var(--subtle); color: var(--text); }
+  .btn-danger { background: #fff; border-color: var(--err-bd); color: var(--err-fg); }
+  .btn-danger:hover { background: var(--err-bg); }
+  .btn:disabled { opacity: .5; cursor: not-allowed; }
+  .auth-card .btn-primary { width: 100%; height: 38px; }
+  .auth-error { margin-top: 12px; font-size: 12px; color: var(--err-fg); min-height: 18px; }
+
+  /* shell */
+  #app-view { display: none; min-height: 100vh; }
+  .topbar { height: 52px; background: var(--surface); border-bottom: 1px solid var(--border);
+            display: flex; align-items: center; gap: 16px; padding: 0 24px; }
+  .topbar .brand { margin: 0; }
+  .topbar .brand-mark { width: 26px; height: 26px; font-size: 11px; border-radius: 6px; }
+  .topbar .brand-name { font-size: 13px; }
+  .topbar .spacer { flex: 1; }
+  .pill { display: inline-flex; align-items: center; gap: 6px; height: 24px; padding: 0 9px;
+          border-radius: 4px; font-size: 11px; font-weight: 500; border: 1px solid var(--border);
+          background: var(--subtle); color: var(--muted); }
+  .pill.ok { color: var(--ok-fg); background: var(--ok-bg); border-color: var(--ok-bd); }
+  .pill.err { color: var(--err-fg); background: var(--err-bg); border-color: var(--err-bd); }
+  .dot { width: 6px; height: 6px; border-radius: 50%; background: currentColor; }
+  .layout { display: grid; grid-template-columns: 208px minmax(0, 1fr); min-height: calc(100vh - 52px); }
+  .sidebar { background: var(--surface); border-right: 1px solid var(--border); padding: 20px 12px; }
+  .nav-label { padding: 0 10px 8px; font-size: 11px; font-weight: 500; color: var(--faint);
+               text-transform: uppercase; letter-spacing: .06em; }
+  .nav-item { display: flex; align-items: center; gap: 10px; height: 34px; padding: 0 10px; border-radius: var(--radius-sm);
+              color: var(--muted); font-size: 13px; font-weight: 500; cursor: pointer; margin-bottom: 2px; }
+  .nav-item:hover { background: var(--subtle); color: var(--text); }
+  .nav-item.active { background: var(--accent-soft); color: var(--accent-hover); }
+  .nav-item svg { width: 16px; height: 16px; flex: none; }
+  .content { padding: 28px 32px 48px; max-width: 1180px; width: 100%; }
+  .page-head { display: flex; align-items: flex-start; justify-content: space-between; gap: 16px; margin-bottom: 24px; }
+  .page-head p { font-size: 13px; color: var(--muted); margin-top: 4px; }
+  .section { display: none; }
+  .section.active { display: block; }
+  .card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 20px; margin-bottom: 16px; }
+  .card-head { display: flex; align-items: flex-start; justify-content: space-between; gap: 12px; margin-bottom: 16px; }
+  .card-head p { font-size: 12px; color: var(--muted); margin-top: 3px; }
+  .row { display: flex; gap: 10px; align-items: flex-end; flex-wrap: wrap; }
+  .row > label.field { margin: 0; min-width: 180px; flex: 1; }
+  .row > .btn { margin-bottom: 0; }
+  .kpis { display: grid; grid-template-columns: repeat(3, minmax(0,1fr)); gap: 12px; margin-bottom: 16px; }
+  .kpi { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 16px; }
+  .kpi .label { font-size: 11px; font-weight: 500; color: var(--faint); text-transform: uppercase; letter-spacing: .05em; }
+  .kpi .value { font-size: 24px; font-weight: 600; letter-spacing: -.02em; margin-top: 8px; font-variant-numeric: tabular-nums; }
+  .kpi .hint { font-size: 12px; color: var(--muted); margin-top: 2px; }
+  .table-wrap { overflow-x: auto; border: 1px solid var(--border); border-radius: var(--radius); }
+  table { width: 100%; border-collapse: collapse; font-size: 13px; }
+  thead th { background: var(--subtle); color: var(--muted); font-size: 11px; font-weight: 500;
+             text-transform: uppercase; letter-spacing: .04em; text-align: left; padding: 10px 14px; white-space: nowrap; }
+  tbody td { padding: 10px 14px; border-top: 1px solid var(--border); vertical-align: middle; }
+  tbody tr:hover { background: #fbfcfe; }
+  .empty { padding: 36px 16px; text-align: center; color: var(--faint); font-size: 13px; }
+  .tag { display: inline-flex; align-items: center; padding: 1px 7px; border-radius: 4px; font-size: 11px;
+         font-weight: 500; border: 1px solid var(--border); background: var(--subtle); color: var(--muted); }
+  .tag.ok { color: var(--ok-fg); background: var(--ok-bg); border-color: var(--ok-bd); }
+  .log { background: #0f172a; color: #cbd5e1; border-radius: var(--radius-sm); padding: 12px 14px;
+         font: 12px/1.6 var(--mono); max-height: 220px; overflow: auto; white-space: pre-wrap; word-break: break-word; }
+  #toasts { position: fixed; top: 66px; right: 24px; display: flex; flex-direction: column; gap: 8px; z-index: 20; }
+  .toast { min-width: 240px; padding: 10px 14px; background: var(--surface); border: 1px solid var(--border);
+           border-left: 3px solid var(--accent); border-radius: var(--radius-sm); box-shadow: var(--shadow-lg); font-size: 13px; }
+  .toast.error { border-left-color: var(--err-fg); }
+  .toast.success { border-left-color: var(--ok-fg); }
+  @media (max-width: 800px) {
+    .layout { grid-template-columns: 1fr; }
+    .sidebar { display: none; }
+    .content { padding: 20px 16px 40px; }
+    .kpis { grid-template-columns: 1fr; }
+  }
 </style>
 </head>
 <body>
-<h1>Portable Lethe — Administration</h1>
-<div class="card">
-  <h3>Login</h3>
-  <input id="password" type="password" placeholder="admin password">
-  <button onclick="login()">Sign in</button>
-  <span id="status"></span>
+
+<div id="auth-view">
+  <div class="auth-card">
+    <div class="brand">
+      <div class="brand-mark">PL</div>
+      <div><div class="brand-name">Portable Lethe</div><div class="brand-sub">Administration</div></div>
+    </div>
+    <h2>管理控制台</h2>
+    <p>输入管理密码以查看账号、配置与运行日志。</p>
+    <label class="field"><span>管理密码</span>
+      <input id="password" type="password" placeholder="admin password" autocomplete="current-password" autofocus>
+    </label>
+    <button class="btn btn-primary" id="login-btn" onclick="login()">Sign in</button>
+    <div class="auth-error" id="auth-error"></div>
+  </div>
 </div>
-<div class="card">
-  <h3>Accounts</h3>
-  <button onclick="loadAccounts()">Refresh</button>
-  <input id="newName" placeholder="new username">
-  <button onclick="createAccount()">Create</button>
-  <table><thead><tr><th>IngameId</th><th>Username</th><th>DiscordId</th><th>Created</th><th>Actions</th></tr></thead>
-  <tbody id="rows"></tbody></table>
+
+<div id="app-view">
+  <header class="topbar">
+    <div class="brand">
+      <div class="brand-mark">PL</div><div class="brand-name">Portable Lethe</div>
+    </div>
+    <span class="pill ok"><span class="dot"></span> Local server</span>
+    <div class="spacer"></div>
+    <button class="btn btn-ghost" onclick="signOut()">Sign out</button>
+  </header>
+  <div class="layout">
+    <aside class="sidebar">
+      <div class="nav-label">Workspace</div>
+      <div class="nav-item active" data-section="overview" onclick="show('overview')">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>概览</div>
+      <div class="nav-item" data-section="accounts" onclick="show('accounts')">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75"><circle cx="9" cy="8" r="3"/><path d="M3 20c0-3.3 2.7-6 6-6s6 2.7 6 6M17 11h5M19.5 8.5v5"/></svg>账号</div>
+      <div class="nav-item" data-section="documents" onclick="show('documents')">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75"><path d="M14 3H6a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V9z"/><path d="M14 3v6h6M8 13h8M8 17h5"/></svg>文档编辑</div>
+      <div class="nav-item" data-section="activity" onclick="show('activity')">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75"><path d="M12 8v4l3 2"/><circle cx="12" cy="12" r="9"/></svg>请求日志</div>
+    </aside>
+    <main class="content">
+      <div class="page-head">
+        <div><h1 id="page-title">概览</h1><p id="page-desc">本地私服运行状态与快捷操作</p></div>
+      </div>
+
+      <section class="section active" id="sec-overview">
+        <div class="kpis">
+          <div class="kpi"><div class="label">Accounts</div><div class="value" id="kpi-accounts">—</div><div class="hint">本地账号总数</div></div>
+          <div class="kpi"><div class="label">Latest request</div><div class="value" id="kpi-status">—</div><div class="hint">最近一次 API 状态</div></div>
+          <div class="kpi"><div class="label">Session</div><div class="value" id="kpi-session">Active</div><div class="hint">管理员令牌已加载</div></div>
+        </div>
+        <div class="card">
+          <div class="card-head"><div><h2>快速开始</h2><p>常用操作集中在这里</p></div></div>
+          <div class="row">
+            <button class="btn btn-secondary" onclick="loadAccounts()">刷新账号</button>
+            <button class="btn btn-secondary" onclick="show('accounts')">创建账号</button>
+            <button class="btn btn-ghost" onclick="show('documents')">编辑账号文档</button>
+          </div>
+        </div>
+      </section>
+
+      <section class="section" id="sec-accounts">
+        <div class="card">
+          <div class="card-head"><div><h2>账号列表</h2><p>创建、删除本地私服账号</p></div><button class="btn btn-secondary" onclick="loadAccounts()">Refresh</button></div>
+          <div class="row" style="margin-bottom:16px">
+            <label class="field"><span>新用户名</span><input id="newName" placeholder="username"></label>
+            <button class="btn btn-primary" onclick="createAccount()">Create</button>
+          </div>
+          <div class="table-wrap"><table>
+            <thead><tr><th>Ingame ID</th><th>Username</th><th>Discord ID</th><th>Created</th><th></th></tr></thead>
+            <tbody id="rows"><tr><td colspan="5" class="empty">暂无账号</td></tr></tbody>
+          </table></div>
+        </div>
+      </section>
+
+      <section class="section" id="sec-documents">
+        <div class="card">
+          <div class="card-head"><div><h2>编辑账号文档</h2><p>直接修改账号的 JSON 文档字段</p></div></div>
+          <div class="row" style="margin-bottom:16px">
+            <label class="field"><span>用户名</span><input id="docUser" placeholder="username"></label>
+            <label class="field" style="max-width:200px"><span>字段</span><select id="docField">
+              <option>UserInfo</option><option>Formations</option><option>Egos</option><option>Personalities</option>
+              <option>MdSaveInfo</option><option>StorySaveInfo</option><option>ChapterState</option>
+            </select></label>
+          </div>
+          <label class="field"><span>JSON 内容</span><textarea id="docValue" spellcheck="false">{}</textarea></label>
+          <button class="btn btn-primary" onclick="saveDoc()">Save document</button>
+        </div>
+      </section>
+
+      <section class="section" id="sec-activity">
+        <div class="card">
+          <div class="card-head"><div><h2>请求日志</h2><p>最近一次管理 API 的响应</p></div></div>
+          <div class="log" id="output">等待请求…</div>
+        </div>
+      </section>
+    </main>
+  </div>
 </div>
-<div class="card">
-  <h3>Edit account document</h3>
-  <input id="docUser" placeholder="username">
-  <select id="docField">
-    <option>UserInfo</option><option>Formations</option><option>Egos</option><option>Personalities</option>
-    <option>MdSaveInfo</option><option>StorySaveInfo</option><option>ChapterState</option>
-  </select>
-  <textarea id="docValue" rows="6" style="width:100%">{}</textarea>
-  <button onclick="saveDoc()">Save document</button>
-</div>
-<pre id="output"></pre>
+
+<div id="toasts"></div>
+
 <script>
-let token = '';
-async function call(path, body) {
-  const res = await fetch(path, {method:'POST', headers:{'Content-Type':'application/json'},
-    body: JSON.stringify({...body, token})});
-  const text = await res.text();
-  document.getElementById('output').textContent = res.status + ' ' + text.slice(0,2000);
-  return {ok: res.ok, data: (()=>{try{return JSON.parse(text)}catch{return null}})()};
-}
-async function login(){
-  const r = await fetch('/admin/login',{method:'POST',headers:{'Content-Type':'application/json'},
-    body:JSON.stringify({password:document.getElementById('password').value})});
-  const d = await r.json().catch(()=>({}));
-  if(r.ok){ token=d.token; document.getElementById('status').textContent='authenticated'; loadAccounts(); }
-  else document.getElementById('status').textContent='login failed';
-}
-async function loadAccounts(){
-  const r = await call('/admin/accounts',{});
-  if(!r.ok||!r.data) return;
-  document.getElementById('rows').innerHTML = r.data.accounts.map(a=>
-    `<tr><td>${a.ingameId}</td><td>${a.username}</td><td>${a.discordId||''}</td><td>${a.createdAt}</td>
-     <td><button onclick="del('${a.username}')">Delete</button></td></tr>`).join('');
-}
-async function createAccount(){
-  await call('/admin/accounts/create',{username:document.getElementById('newName').value});
-  loadAccounts();
-}
-async function del(name){ if(confirm('Delete '+name+'?')){ await call('/admin/accounts/delete',{username:name}); loadAccounts(); } }
-async function saveDoc(){
-  await call('/admin/accounts/document',{username:document.getElementById('docUser').value,
-    field:document.getElementById('docField').value, value:document.getElementById('docValue').value});
-}
+  const TOKEN_KEY = 'pl_admin_token';
+  let token = sessionStorage.getItem(TOKEN_KEY) || '';
+
+  const titles = {
+    overview: ['概览', '本地私服运行状态与快捷操作'],
+    accounts: ['账号', '创建、删除与管理本地账号'],
+    documents: ['文档编辑', '直接修改账号的 JSON 文档字段'],
+    activity: ['请求日志', '管理 API 的最近响应']
+  };
+
+  function toast(text, tone = '') {
+    const el = document.createElement('div');
+    el.className = 'toast ' + tone;
+    el.textContent = text;
+    document.getElementById('toasts').appendChild(el);
+    setTimeout(() => el.remove(), 4000);
+  }
+  function show(name) {
+    document.querySelectorAll('.section').forEach(s => s.classList.toggle('active', s.id === 'sec-' + name));
+    document.querySelectorAll('.nav-item').forEach(n => n.classList.toggle('active', n.dataset.section === name));
+    document.getElementById('page-title').textContent = titles[name][0];
+    document.getElementById('page-desc').textContent = titles[name][1];
+  }
+  function authenticated() {
+    document.getElementById('auth-view').style.display = 'none';
+    document.getElementById('app-view').style.display = 'block';
+    document.getElementById('kpi-session').textContent = 'Active';
+  }
+  async function call(path, body) {
+    const res = await fetch(path, { method: 'POST', headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ ...(body || {}), token }) });
+    const text = await res.text();
+    let data = null; try { data = JSON.parse(text); } catch (_) {}
+    document.getElementById('output').textContent = res.status + ' ' + text.slice(0, 2000);
+    document.getElementById('kpi-status').textContent = res.status;
+    if (res.status === 401) { signOut(); toast('会话已过期，请重新登录', 'error'); }
+    return { ok: res.ok, data };
+  }
+  async function login() {
+    const err = document.getElementById('auth-error');
+    err.textContent = '';
+    try {
+      const res = await fetch('/admin/login', { method: 'POST', headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ password: document.getElementById('password').value }) });
+      const d = await res.json().catch(() => ({}));
+      if (!res.ok || !d.token) { err.textContent = '登录失败，请检查管理密码'; return; }
+      token = d.token;
+      sessionStorage.setItem(TOKEN_KEY, token);
+      authenticated();
+      toast('已登录', 'success');
+      loadAccounts();
+    } catch (e) { err.textContent = '无法连接服务端: ' + e.message; }
+  }
+  function signOut() {
+    token = ''; sessionStorage.removeItem(TOKEN_KEY);
+    document.getElementById('auth-view').style.display = 'grid';
+    document.getElementById('app-view').style.display = 'none';
+    document.getElementById('password').value = '';
+  }
+  function esc(s) { return String(s == null ? '' : s).replace(/[&<>"']/g, c =>
+    ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
+  async function loadAccounts() {
+    const r = await call('/admin/accounts', {});
+    document.getElementById('kpi-accounts').textContent = r.data?.accounts?.length ?? '—';
+    const rows = document.getElementById('rows');
+    if (!r.ok || !r.data?.accounts?.length) {
+      rows.innerHTML = '<tr><td colspan="5" class="empty">暂无账号</td></tr>'; return;
+    }
+    rows.innerHTML = r.data.accounts.map(a =>
+      '<tr><td class="mono">' + esc(a.ingameId) + '</td><td>' + esc(a.username) + '</td><td class="muted">' +
+      esc(a.discordId || '—') + '</td><td class="muted">' + esc(a.createdAt) + '</td><td>' +
+      '<button class="btn btn-danger" onclick="del(' + JSON.stringify(a.username) + ')">Delete</button></td></tr>'
+    ).join('');
+  }
+  async function createAccount() {
+    const name = document.getElementById('newName').value.trim();
+    if (!name) { toast('请输入用户名', 'error'); return; }
+    const r = await call('/admin/accounts/create', { username: name });
+    if (r.ok) { document.getElementById('newName').value = ''; toast('账号已创建', 'success'); }
+    loadAccounts();
+  }
+  async function del(name) {
+    if (!confirm('删除账号 ' + name + '?')) return;
+    await call('/admin/accounts/delete', { username: name });
+    loadAccounts();
+  }
+  async function saveDoc() {
+    const r = await call('/admin/accounts/document', {
+      username: document.getElementById('docUser').value,
+      field: document.getElementById('docField').value,
+      value: document.getElementById('docValue').value
+    });
+    if (r.ok) toast('文档已保存', 'success');
+  }
+  document.getElementById('password').addEventListener('keydown', e => {
+    if (e.key === 'Enter') login();
+  });
+  if (token) authenticated();
 </script>
 </body>
 </html>

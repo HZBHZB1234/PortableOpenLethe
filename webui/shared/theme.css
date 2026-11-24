@@ -1,0 +1,141 @@
+/*
+ * Shared Lethe design tokens — imported by BOTH the admin and auth entries so
+ * Vite hoists it into one hashed stylesheet under /assets/.
+ * Dark near-black canvas, hairline borders, serif display, signature red.
+ */
+:root {
+  --canvas: #0b0c0e;
+  --surface: #101114;
+  --surface-2: #141519;
+  --surface-3: #191a1f;
+  --border: #2a2b2f;
+  --border-strong: #3a3b40;
+  --text: #e9e6e0;
+  --muted: #9b9a97;
+  --faint: #6d6c69;
+  --accent: #c0392b;
+  --accent-bright: #d64535;
+  --accent-soft: rgba(192, 57, 43, .14);
+  --accent-line: rgba(192, 57, 43, .45);
+  --ok: #86b784;
+  --warn: #c9a227;
+  --err: #d64535;
+  --font-serif: Georgia, 'Times New Roman', 'Songti SC', 'STSong', serif;
+  --font-sans: 'Inter', 'Geist', -apple-system, BlinkMacSystemFont, 'Segoe UI',
+    'PingFang SC', 'Microsoft YaHei', system-ui, sans-serif;
+  --font-mono: 'JetBrains Mono', 'SFMono-Regular', Consolas, 'Liberation Mono', monospace;
+  --radius: 4px;
+}
+
+* { box-sizing: border-box; }
+html { -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale; }
+body {
+  margin: 0;
+  min-height: 100vh;
+  background: var(--canvas);
+  color: var(--text);
+  font: 13px/1.6 var(--font-sans);
+}
+button, input, select, textarea { font: inherit; color: inherit; }
+button { cursor: pointer; }
+a { color: inherit; text-decoration: none; }
+h1, h2, h3, p { margin: 0; }
+::selection { background: var(--accent); color: #fff; }
+:focus-visible { outline: 1px solid var(--accent-bright); outline-offset: 2px; }
+
+/* Thin, tracked eyebrow — the Lethe signature above every heading. */
+.eyebrow {
+  display: block;
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: .22em;
+  text-transform: uppercase;
+  color: var(--faint);
+}
+.eyebrow.accent { color: var(--accent-bright); }
+.serif { font-family: var(--font-serif); font-weight: 400; }
+.mono { font-family: var(--font-mono); font-variant-numeric: tabular-nums; }
+.muted { color: var(--muted); }
+.faint { color: var(--faint); }
+.hairline { border: 0; border-top: 1px solid var(--border); margin: 20px 0; }
+
+/* A rotated hollow square used as the status diamond in lists. */
+.diamond {
+  width: 7px; height: 7px; flex: none;
+  border: 1px solid var(--accent-bright);
+  transform: rotate(45deg);
+  display: inline-block;
+}
+.diamond.filled { background: var(--accent-bright); }
+.diamond.ok { border-color: var(--ok); }
+.diamond.warn { border-color: var(--warn); }
+
+/* Wordmark: serif LETHE with a red diamond separator. */
+.wordmark { display: flex; align-items: center; gap: 10px; }
+.wordmark .mark-text {
+  font-family: var(--font-serif);
+  font-size: 21px;
+  letter-spacing: .26em;
+  line-height: 1;
+  color: var(--text);
+}
+.wordmark .mark-sep { width: 6px; height: 6px; border: 1px solid var(--accent-bright); transform: rotate(45deg); }
+.wordmark .mark-sub {
+  font-size: 9px; letter-spacing: .2em; text-transform: uppercase;
+  color: var(--faint); padding-left: 11px; border-left: 1px solid var(--border);
+}
+.wordmark.compact .mark-text { font-size: 17px; }
+
+/* Buttons */
+.btn {
+  display: inline-flex; align-items: center; justify-content: center; gap: 8px;
+  height: 34px; padding: 0 14px;
+  border: 1px solid var(--border-strong); border-radius: var(--radius);
+  background: var(--surface-2); color: var(--text);
+  font-size: 12px; font-weight: 500; letter-spacing: .02em;
+  transition: background-color .15s ease, border-color .15s ease, color .15s ease;
+}
+.btn:hover { background: var(--surface-3); border-color: #4a4b52; }
+.btn:disabled { opacity: .45; cursor: not-allowed; }
+.btn-primary {
+  background: var(--accent); border-color: var(--accent); color: #fff;
+  letter-spacing: .12em; text-transform: uppercase; font-weight: 600;
+}
+.btn-primary:hover { background: var(--accent-bright); border-color: var(--accent-bright); }
+.btn-outline { background: transparent; }
+.btn-ghost { background: transparent; border-color: transparent; color: var(--muted); }
+.btn-ghost:hover { background: var(--surface-2); color: var(--text); border-color: transparent; }
+.btn-danger { color: var(--err); background: transparent; border-color: var(--border); }
+.btn-danger:hover { background: var(--accent-soft); border-color: var(--accent-line); color: var(--accent-bright); }
+.btn svg { width: 14px; height: 14px; }
+
+/* Form controls shared by both SPAs */
+.field { display: block; }
+.field > span {
+  display: block; margin-bottom: 7px;
+  font-size: 10px; font-weight: 600; letter-spacing: .18em;
+  text-transform: uppercase; color: var(--faint);
+}
+input, select, textarea {
+  width: 100%; padding: 9px 11px;
+  background: var(--canvas); color: var(--text);
+  border: 1px solid var(--border); border-radius: var(--radius);
+  outline: none; transition: border-color .15s ease, box-shadow .15s ease;
+}
+input::placeholder, textarea::placeholder { color: #55555a; }
+input:focus, select:focus, textarea:focus {
+  border-color: var(--accent-line);
+  box-shadow: 0 0 0 3px rgba(192, 57, 43, .10);
+}
+textarea { resize: vertical; font-family: var(--font-mono); font-size: 12px; line-height: 1.65; }
+
+/* Footer used on the login/done pages. */
+.site-footer {
+  border-top: 1px solid var(--border);
+  padding-top: 18px; margin-top: 28px;
+  display: flex; flex-wrap: wrap; gap: 8px 18px;
+  justify-content: space-between; align-items: center;
+  font-size: 11px; color: var(--faint);
+}
+.site-footer a { color: var(--muted); border-bottom: 1px solid var(--border); }
+.site-footer a:hover { color: var(--accent-bright); border-bottom-color: var(--accent); }
